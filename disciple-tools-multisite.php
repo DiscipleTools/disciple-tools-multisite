@@ -1,4 +1,4 @@
-<?php
+wp<?php
 /**
  * Plugin Name: Disciple Tools - Multisite
  * Plugin URI:  https://github.com/DiscipleTools/disciple-tools-multisite
@@ -45,3 +45,10 @@ if ( ! function_exists( 'dt_write_log' ) ) {
         }
     }
 }
+
+function dt_multisite_disable_arvada_header() {
+    ?>
+    <style>#fusion-slider-3 {display:none;}</style>
+    <?php
+}
+add_action( 'signup_header', 'dt_multisite_disable_arvada_header' );
