@@ -48,7 +48,10 @@ if ( ! function_exists( 'dt_write_log' ) ) {
 
 function dt_multisite_disable_arvada_header() {
     ?>
-    <style>#fusion-slider-3 {display:none;}</style>
+    <style type="text/css">
+        #fusion-slider-3 {display:none;}
+        #privacy {display:none;}
+    </style>
     <?php
 }
 add_action( 'signup_header', 'dt_multisite_disable_arvada_header' );
