@@ -1,4 +1,4 @@
-wp<?php
+<?php
 /**
  * Plugin Name: Disciple Tools - Multisite
  * Plugin URI:  https://github.com/DiscipleTools/disciple-tools-multisite
