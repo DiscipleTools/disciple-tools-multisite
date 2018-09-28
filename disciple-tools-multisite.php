@@ -44,6 +44,19 @@ function dt_multisite_disable_arvada_header() {
     <style type="text/css">
         #fusion-slider-3 {display:none;}
         #privacy {display:none;}
+        #signup-content input#signupuser {
+            display: none;
+        }
+        #signup-content label[for=signupuser] {
+            display: none;
+            font-size: 0;
+        }
+        #signup-content h2 {
+            color: white;
+        }
+        #signup-content a {
+            text-decoration: underline;
+        }
     </style>
     <?php
 }
