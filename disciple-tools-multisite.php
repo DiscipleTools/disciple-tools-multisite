@@ -57,7 +57,7 @@ function dt_multisite_disable_arvada_header() {
 		#signup-content a {
 			text-decoration: underline;
 		}
-	        .mu_register {
+	        #signup-content .mu_register {
 			margin: 30px auto;
 			width: 50%;
 	    	}
@@ -91,9 +91,18 @@ function dt_multisite_disable_arvada_header() {
 			-o-transition: all .2s;
 			-webkit-border-radius: 2px;
 			padding: 9px 20px;
-			width: auto;
+			width: auto !important;
 		}
 
+	    	@media only screen and (max-width: 768px) {
+		/* For mobile phones: */      	
+			#signup-content .mu_register {				
+			margin: 30px auto;				
+			width: 100%;
+	    		
+			}
+    		
+		}
 }
     </style>
     <?php
