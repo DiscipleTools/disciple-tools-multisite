@@ -72,6 +72,7 @@ function dt_multisite_disable_arvada_header() {
 			background: #d1e990;
 			text-transform: uppercase;
 			color: #6e9a1f;
+			font-size: 18px;
 			background-image: -webkit-gradient( linear, left bottom, left top, from( #aad75b ), to( #d1e990 ) );
 			background-image: linear-gradient( to top, #aad75b, #d1e990 );
 			background-image: -webkit-linear-gradient( to top, #aad75b, #d1e990 );
