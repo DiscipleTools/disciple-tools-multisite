@@ -106,7 +106,6 @@ function dt_multisite_disable_arvada_header() {
 				font-weight: 700;
 			}
 		}
-}
     </style>
     <?php
 }
