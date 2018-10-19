@@ -57,6 +57,43 @@ function dt_multisite_disable_arvada_header() {
 		#signup-content a {
 			text-decoration: underline;
 		}
+	        .mu_register {
+			margin: 30px auto;
+			width: 50%;
+	    	}
+	    	#signup-content input#signupblog {
+		  	display: none;
+	    	}
+		#signup-content label[for=signupblog] {
+			display: none;
+			font-size: 0;
+	    	}
+       		.mu_register input[name="submit"] {
+			background: #d1e990;
+			text-transform: uppercase;
+			color: #6e9a1f;
+			background-image: -webkit-gradient( linear, left bottom, left top, from( #aad75b ), to( #d1e990 ) );
+			background-image: linear-gradient( to top, #aad75b, #d1e990 );
+			background-image: -webkit-linear-gradient( to top, #aad75b, #d1e990 );
+			background-image: -moz-linear-gradient( to top, #aad75b, #d1e990 );
+			background-image: -ms-linear-gradient( to top, #aad75b, #d1e990 );
+			background-image: -o-linear-gradient( to top, #aad75b, #d1e990 );
+			filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#d1e990, endColorstr=#aad75b);
+			transition: all .2s;
+			border-width: 0px;
+			border-style: solid;
+			border-color: #6e9a1f;
+			border-radius: 2px;
+			-webkit-transition: all .2s;
+			-moz-transition: all .2s;
+			-ms-transition: all .2s;
+			-o-transition: all .2s;
+			-webkit-border-radius: 2px;
+			padding: 9px 20px;
+			width: auto;
+		}
+
+}
     </style>
     <?php
 }
@@ -87,6 +124,9 @@ function dt_head(){
 			-ms-transition: all .2s;
 			-o-transition: all .2s;
 			-webkit-border-radius: 2px;
+		}
+	#signup-content h2 {
+			color: white;
 		}
     </style>
 	<?php
