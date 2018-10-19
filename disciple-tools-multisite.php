@@ -72,7 +72,8 @@ function dt_multisite_disable_arvada_header() {
 			background: #d1e990;
 			text-transform: uppercase;
 			color: #6e9a1f;
-			font-size: 18px;
+			font-size: 18px !important;
+			font-weight: 700;
 			background-image: -webkit-gradient( linear, left bottom, left top, from( #aad75b ), to( #d1e990 ) );
 			background-image: linear-gradient( to top, #aad75b, #d1e990 );
 			background-image: -webkit-linear-gradient( to top, #aad75b, #d1e990 );
@@ -97,11 +98,13 @@ function dt_multisite_disable_arvada_header() {
 	    	@media only screen and (max-width: 768px) {
 		/* For mobile phones: */      	
 			#signup-content .mu_register {				
-			margin: 30px auto;				
-			width: 100%;
-	    		
+				margin: 30px auto;				
+				width: 100%;
 			}
-    		
+    		        .mu_register input[name="submit"] {
+				font-size: 18px !important;
+				font-weight: 700;
+			}
 		}
 }
     </style>
@@ -138,6 +141,16 @@ function dt_head(){
 	#signup-content h2 {
 			color: white;
 		}
+			        #signup-content .mu_register {
+			margin: 30px auto;
+			width: 50%;
+	    	}
+		@media only screen and (max-width: 768px) {
+		/* For mobile phones: */      	
+			#signup-content .mu_register {				
+				margin: 30px auto;				
+				width: 100%;
+			}
     </style>
 	<?php
 }
