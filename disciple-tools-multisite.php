@@ -176,8 +176,8 @@ function dt_head() {
 
 add_action( 'wp_head', 'dt_head' );
 
-function dt_wpmu_signup_blog_notification_email( $message, $domain, $path, $title, $user, $user_email, $key, $meta ) {
+function dt_wpmu_signup_blog_notification_email_rename( $message, $domain, $path, $title, $user, $user_email, $key, $meta ) {
     return str_replace( "blog", "site", $message );
 }
 
-add_filter( 'wpmu_signup_blog_notification_email', 'dt_wpmu_signup_blog_notification_email', 10, 8 );
+add_filter( 'wpmu_signup_blog_notification_email', 'dt_wpmu_signup_blog_notification_email_rename', 10, 8 );
