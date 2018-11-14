@@ -163,6 +163,18 @@ function dt_head() {
             width: 50%;
         }
 
+        #signup-content .wp-activate-container .view a {
+            background-color: #d1e990;
+            color: #6e9a1f;
+            background-image: linear-gradient(to top, #aad75b, #d1e990);
+            padding: 9px 20px;
+            border-width: 0px;
+        ￼   border-style: solid;
+        ￼   border-color: #6e9a1f;
+            text-align: center;
+            font-size: 12px
+        }
+
         @media only screen and (max-width: 768px) {
             /* For mobile phones: */
             #signup-content .wp-activate-container {
