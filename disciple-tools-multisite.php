@@ -6,190 +6,266 @@
  * Version:     1.0
  */
 
-/**
- * Set the new blog theme to Disciple Tools.
- */
-define( 'WP_DEFAULT_THEME', 'disciple-tools-theme' );
-function dt_new_blog_force_dt_theme( $blog_id, $user_id, $domain, $path, $site_id, $meta ) {
-    define( 'WP_DEFAULT_THEME', 'disciple-tools-theme' );
-    update_blog_option( $blog_id, 'template', 'disciple-tools-theme' );
-    update_blog_option( $blog_id, 'stylesheet', 'disciple-tools-theme' );
-    update_blog_option( $blog_id, 'current_theme', 'Disciple Tools' );
-}
+/** Multisite wrapper */
+if ( is_multisite() ) : // check if system is multisite, if not do not run.
 
-add_action( 'wpmu_new_blog', 'dt_new_blog_force_dt_theme', 10, 6 );
+    function dt_multisite_token()
+    {
+        return 'disciple-tools-multisite';
+    }
 
-/**
- * Dev functions for easily logging
- */
-if ( !function_exists( 'dt_write_log' ) ) {
-    /**
-     * A function to assist development only.
-     * This function allows you to post a string, array, or object to the WP_DEBUG log.
-     *
-     * @param $log
+    /**********************************************************************************************************************
+     * MAKE DISCIPLE TOOLS DEFAULT THEME
      */
-    function dt_write_log( $log ) {
-        if ( true === WP_DEBUG ) {
-            if ( is_array( $log ) || is_object( $log ) ) {
-                error_log( print_r( $log, true ) );
-            } else {
-                error_log( $log );
+    define( 'WP_DEFAULT_THEME', 'disciple-tools-theme' );
+
+    function dt_new_blog_force_dt_theme( $blog_id, $user_id, $domain, $path, $site_id, $meta )
+    {
+        define( 'WP_DEFAULT_THEME', 'disciple-tools-theme' );
+        update_blog_option( $blog_id, 'template', 'disciple-tools-theme' );
+        update_blog_option( $blog_id, 'stylesheet', 'disciple-tools-theme' );
+        update_blog_option( $blog_id, 'current_theme', 'Disciple Tools' );
+    }
+    add_action( 'wpmu_new_blog', 'dt_new_blog_force_dt_theme', 10, 6 );
+    /** End Make Disciple.Tools Default */
+
+
+
+    /**********************************************************************************************************************
+     * ADMIN MENU
+     */
+    function dt_multisite_network_admin_menu()
+    {
+        add_menu_page( 'Disciple Tools', 'Disciple Tools', 'manage_options', dt_multisite_token(), 'dt_multisite_network_admin_content', 'dashicons-admin-tools' );
+    }
+    add_action( 'network_admin_menu', 'dt_multisite_network_admin_menu', 10, 2 );
+
+    function dt_multisite_network_admin_content()
+    {
+        if ( ! current_user_can( 'manage_options' ) ) { // manage dt is a permission that is specific to Disciple Tools and allows admins, strategists and dispatchers into the wp-admin
+            wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.' ) );
+        }
+
+        if ( isset( $_GET[ "tab" ] ) ) {
+            $tab = sanitize_key( wp_unslash( $_GET[ "tab" ] ) );
+        } else {
+            $tab = 'general';
+        }
+
+        $link = 'admin.php?page=' . esc_html( dt_multisite_token() ) . '&tab=';
+
+        ?>
+        <div class="wrap">
+            <h2><?php echo esc_html( 'Disciple Tools Multisite Configuration' ) ?></h2>
+            <h2 class="nav-tab-wrapper">
+                <a href="<?php echo esc_attr( $link ) . 'general' ?>" class="nav-tab
+                <?php echo ( $tab == 'general' || ! isset( $tab ) ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
+                    <?php echo esc_attr( 'Overview' ) ?></a>
+
+                <a href="<?php echo esc_attr( $link ) . 'network' ?>" class="nav-tab
+                <?php echo ( $tab == 'network' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
+                    <?php echo esc_attr( 'Network Dashboard Settings' ) ?>
+                </a>
+
+            </h2>
+
+            <?php
+            switch ( $tab ) {
+                case "general":
+                    $object = new DT_Multisite_Tab_Overview();
+                    $object->content();
+                    break;
+                case "network":
+                    $object = new DT_Multisite_Tab_Network_Dashboard();
+                    $object->content();
+                    break;
+
+                default:
+                    break;
             }
+            ?>
+        </div><!-- End wrap -->
+        <?php
+    }
+    /** End Network Dashboard Features */
+
+    /**
+     * Class DT_Starter_Tab_Second
+     */
+    class DT_Multisite_Tab_Overview
+    {
+        public function content()
+        {
+            ?>
+            <div class="wrap">
+                <div id="poststuff">
+                    <div id="post-body" class="metabox-holder columns-2">
+                        <div id="post-body-content">
+                            <!-- Main Column -->
+
+                            <?php $this->overview_message() ?>
+
+                            <!-- End Main Column -->
+                        </div><!-- end post-body-content -->
+                        <div id="postbox-container-1" class="postbox-container">
+                            <!-- Right Column -->
+
+                            <!-- End Right Column -->
+                        </div><!-- postbox-container 1 -->
+                        <div id="postbox-container-2" class="postbox-container">
+                        </div><!-- postbox-container 2 -->
+                    </div><!-- post-body meta box container -->
+                </div><!--poststuff end -->
+            </div><!-- wrap end -->
+            <?php
+        }
+
+        public function overview_message()
+        {
+            ?>
+            <style>dt {
+                    font-weight: bold;
+                }</style>
+            <!-- Box -->
+            <table class="widefat striped">
+                <thead>
+                <th>Overview of Plugin</th>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <dl>
+                            <dt>Plugin Purpose</dt>
+                        </dl>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <!-- End Box -->
+            <?php
         }
     }
-}
 
-function dt_multisite_disable_arvada_header() {
-    ?>
-    <style type="text/css">
-        #fusion-slider-3 {
-            display: none;
-        }
-
-        #privacy {
-            display: none;
-        }
-
-        #signup-content input#signupuser {
-            display: none;
-        }
-
-        #signup-content label[for=signupuser] {
-            display: none;
-            font-size: 0;
-        }
-
-        #signup-content h2 {
-            color: white;
-        }
-
-        #signup-content a {
-            text-decoration: underline;
-        }
-
-        #signup-content .mu_register {
-            margin: 30px auto;
-            width: 50%;
-        }
-
-        #signup-content input#signupblog {
-            display: none;
-        }
-
-        #signup-content label[for=signupblog] {
-            display: none;
-            font-size: 0;
-        }
-
-        .mu_register input[name="submit"] {
-            background: #d1e990;
-            text-transform: uppercase;
-            color: #6e9a1f;
-            font-size: 18px !important;
-            font-weight: 700;
-            background-image: -webkit-gradient(linear, left bottom, left top, from(#aad75b), to(#d1e990));
-            background-image: linear-gradient(to top, #aad75b, #d1e990);
-            background-image: -webkit-linear-gradient(to top, #aad75b, #d1e990);
-            background-image: -moz-linear-gradient(to top, #aad75b, #d1e990);
-            background-image: -ms-linear-gradient(to top, #aad75b, #d1e990);
-            background-image: -o-linear-gradient(to top, #aad75b, #d1e990);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#d1e990, endColorstr=#aad75b);
-            transition: all .2s;
-            border-width: 0px;
-            border-style: solid;
-            border-color: #6e9a1f;
-            border-radius: 2px;
-            -webkit-transition: all .2s;
-            -moz-transition: all .2s;
-            -ms-transition: all .2s;
-            -o-transition: all .2s;
-            -webkit-border-radius: 2px;
-            padding: 9px 20px;
-            width: auto !important;
-        }
-
-        @media only screen and (max-width: 768px) {
-            /* For mobile phones: */
-            #signup-content .mu_register {
-                margin: 30px auto;
-                width: 100%;
+    /**
+     * Class DT_Starter_Tab_Second
+     */
+    class DT_Multisite_Tab_Network_Dashboard
+    {
+        public function content()
+        {
+            // Checks that the Network Dashboard plugin is installed.
+            $plugins_installed = get_plugins();
+            if ( ! isset( $plugins_installed['disciple-tools-network-dashboard/disciple-tools-network-dashboard.php'] ) ) {
+                $mu_plugins = get_mu_plugins();
+                if ( ! isset( $mu_plugins['disciple-tools-network-dashboard/disciple-tools-network-dashboard.php'] ) ) {
+                    echo 'Network Dashboard plugin for Disciple Tools is not installed.<br>';
+                    echo '<a href="https://github.com/DiscipleTools/disciple-tools-network-dashboard" target="_blank">Download the Network Dashboard Plugin</a>';
+                    return;
+                }
             }
 
-            .mu_register input[name="submit"] {
-                font-size: 18px !important;
-                font-weight: 700;
+            ?>
+            <div class="wrap">
+                <div id="poststuff">
+                    <div id="post-body" class="metabox-holder columns-1">
+                        <div id="post-body-content">
+                            <!-- Main Column -->
+
+                            <?php $this->sites_with_network_dashboard() ?>
+                            <?php $this->main_column() ?>
+
+                            <!-- End Main Column -->
+                        </div><!-- end post-body-content -->
+
+                    </div><!-- post-body meta box container -->
+                </div><!--poststuff end -->
+            </div><!-- wrap end -->
+            <?php
+        }
+
+        public function main_column()
+        {
+            ?>
+            <table class="widefat striped">
+                <thead>
+                <th>Overview of Network Dashboard Plugin</th>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <strong>Features</strong>
+                        <ol>
+
+                            <li>The Network Dashboard Plugin can be independently installed in individual sites within the
+                            multisite network. It can setup remote sites independently, which requires agreement from the
+                            corresponding site to make a site-to-site connection and provide reporting data. This kind of
+                            reporting down not require permission at a network level.</li>
+                            <li>The Network Dashboard Plugin can also be given permission to gather reports from the
+                            multisite network. This permission is controled on this panel by super admins of the network.
+                            If permission is enabled, the network dashboard will have a new tab appear in the admin panel
+                            and will be able to collect reports from all sites it has been given permission to gather
+                            reports from.</li>
+                            <li>The need this is addressing is the fluid nature of org structures. Where one group might
+                            need to get reporting from a subset of all the Disciple Tools systems on the multisite, and
+                            another might need reporting on all the systems in the Disciple Tools multisite.</li>
+                            <li>Enabling permission to a Network Dashboard of a certain site, allows it to collect reports
+                            even if the "Network Dashboard" setting has not been enabled or a site-to-site connection
+                            has been made. This becomes an advantage for a network administrator and reduces the
+                            required setup for a site-to-site connection.</li>
+                        </ol>
+
+                        <br>
+                        <a href="https://github.com/DiscipleTools/disciple-tools-network-dashboard" target="_blank">Download the Network Dashboard Plugin from Github</a>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <?php
+        }
+
+        public function sites_with_network_dashboard() {
+            global $wpdb;
+            $table = $wpdb->base_prefix . 'blogs';
+            $sites = $wpdb->get_col("SELECT blog_id FROM $table" );
+            if ( empty( $sites ) ) {
+                echo 'No sites installed.';
+                return;
             }
-        }
-    </style>
-    <?php
-}
 
-add_action( 'signup_header', 'dt_multisite_disable_arvada_header' );
+            foreach ( $sites as $site ) {
+                $active_plugins = get_blog_option( $site, 'active_plugins' );
 
-
-function dt_head() {
-    ?>
-    <style type="text/css">
-        .home .fusion-button {
-            background: #d1e990;
-            text-transform: uppercase;
-            color: #6e9a1f;
-            background-image: -webkit-gradient(linear, left bottom, left top, from(#aad75b), to(#d1e990));
-            background-image: linear-gradient(to top, #aad75b, #d1e990);
-            background-image: -webkit-linear-gradient(to top, #aad75b, #d1e990);
-            background-image: -moz-linear-gradient(to top, #aad75b, #d1e990);
-            background-image: -ms-linear-gradient(to top, #aad75b, #d1e990);
-            background-image: -o-linear-gradient(to top, #aad75b, #d1e990);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#d1e990, endColorstr=#aad75b);
-            transition: all .2s;
-            border-width: 0px;
-            border-style: solid;
-            border-color: #6e9a1f;
-            border-radius: 2px;
-            -webkit-transition: all .2s;
-            -moz-transition: all .2s;
-            -ms-transition: all .2s;
-            -o-transition: all .2s;
-            -webkit-border-radius: 2px;
-        }
-
-        #signup-content h2 {
-            color: white;
-        }
-
-        #signup-content .wp-activate-container {
-            margin: 30px auto;
-            width: 50%;
-        }
-
-        #signup-content .wp-activate-container .view a {
-            background-color: #d1e990;
-            color: #6e9a1f;
-            background-image: linear-gradient(to top, #aad75b, #d1e990);
-            padding: 9px 20px;
-            border-width: 0px;
-        ￼   border-style: solid;
-        ￼   border-color: #6e9a1f;
-            text-align: center;
-            font-size: 12px
-        }
-
-        @media only screen and (max-width: 768px) {
-            /* For mobile phones: */
-            #signup-content .wp-activate-container {
-                margin: 30px auto;
-                width: 100%;
+                if ( empty( $active_plugins ) ) {
+                    continue;
+                }
+                foreach ( $active_plugins as $plugin ) {
+                    if ( $plugin === 'disciple-tools-network-dashboard/disciple-tools-network-dashboard.php' ) {
+                        dt_write_log('has active nd: ' . $site );
+                    }
+                }
             }
+
+
+            ?>
+            <table class="widefat striped">
+                <thead>
+                <th>Sites with Network Dashboard Activated</th>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <?php
         }
-    </style>
-    <?php
-}
 
-add_action( 'wp_head', 'dt_head' );
+    }
 
-function dt_wpmu_signup_blog_notification_email_rename( $message, $domain, $path, $title, $user, $user_email, $key, $meta ) {
-    return str_replace( "blog", "site", $message );
-}
-
-add_filter( 'wpmu_signup_blog_notification_email', 'dt_wpmu_signup_blog_notification_email_rename', 10, 8 );
+endif; // end multisite check wrapper
