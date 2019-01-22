@@ -149,7 +149,7 @@ if ( is_multisite() ) : // check if system is multisite, if not do not run.
     }
 
     /**
-     * Class DT_Starter_Tab_Second
+     *
      */
     class DT_Multisite_Tab_Network_Dashboard
     {
@@ -228,12 +228,85 @@ if ( is_multisite() ) : // check if system is multisite, if not do not run.
         }
 
         public function sites_with_network_dashboard() {
+
+            // process post
+            $enabled_sites = get_site_option( 'dt_dashboard_approved_sites' );
+            if ( isset( $_POST['dashboards_approved_nonce'] )
+                && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['dashboards_approved_nonce'] ) ), 'dashboards_approved_' . get_current_user_id() ) ) {
+
+                if ( isset( $_POST['enable-all'] ) && ! empty( $_POST['enable-all'] ) ) {
+                    $site_id = sanitize_key( wp_unslash( $_POST['enable-all'] ) );
+                    $enabled_sites[$site_id] = [
+                          'all' => true,
+                          'include_only' => []
+                    ];
+                    update_site_option( 'dt_dashboard_approved_sites', $enabled_sites );
+                    $enabled_sites = get_site_option( 'dt_dashboard_approved_sites' );
+                }
+
+                if ( isset( $_POST['disable-all'] ) && ! empty( $_POST['disable-all'] ) ) {
+                    $site_id = sanitize_key( wp_unslash( $_POST['disable-all'] ) );
+                    unset( $enabled_sites[$site_id] );
+                    update_site_option( 'dt_dashboard_approved_sites', $enabled_sites );
+                    $enabled_sites = get_site_option( 'dt_dashboard_approved_sites' );
+                }
+
+            }
+
+            // get enabled sites
+            $active_sites = $this->get_dashboard_activated_sites();
+            if ( empty( $active_sites ) ) {
+                echo 'No sites found to have activated network dashboard plugin';
+                return;
+            }
+
+            // print table
+            ?>
+            <form method="post">
+                <?php wp_nonce_field('dashboards_approved_' . get_current_user_id(), 'dashboards_approved_nonce') ?>
+                <strong>Sites with Network Dashboard Activated</strong>
+                <table class="widefat striped">
+                    <thead>
+                    <th>ID</th>
+                    <th>Status</th>
+                    <th>Site Name</th>
+                    <th style="width:75px;text-align:center;">Action</th>
+                    </thead>
+                    <tbody>
+                        <?php
+                            foreach ( $active_sites as $value ) {
+                                if ( isset( $enabled_sites[$value->blog_id]['all'] ) && $enabled_sites[$value->blog_id]['all'] === true ) {
+                                    $action = '<button type="submit" class="button" style="background-color:red;border-color:red;color:white;" name="disable-all" value="'.$value->blog_id.'">Disable</button>';
+                                    $status = '&#9989;';
+                                } else {
+                                    $action = '<button type="submit" class="button" name="enable-all" value="'.$value->blog_id.'">Enable</button>';
+                                    $status = '<span style="font-size:1.5em;">&#10007;</span>';
+                                }
+
+                                echo '<tr>';
+                                echo '<td style="width:30px;">' . $value->blog_id . '</td>';
+                                echo '<td style="width:30px;">'.$status.' </td>';
+                                echo '<td>' . $value->blogname . '</td>';
+                                echo '<td style="width:75px;text-align:center;">'.$action.'</td>';
+                                echo '</tr>';
+                            }
+                        ?>
+                    </tbody>
+                </table>
+                <br>
+            </form>
+            <?php
+        }
+
+        public function get_dashboard_activated_sites() {
             global $wpdb;
+            $active_sites = [];
+
+            // Get list of blogs with active network dashboards activated
             $table = $wpdb->base_prefix . 'blogs';
             $sites = $wpdb->get_col("SELECT blog_id FROM $table" );
             if ( empty( $sites ) ) {
-                echo 'No sites installed.';
-                return;
+                return $active_sites;
             }
 
             foreach ( $sites as $site ) {
@@ -244,28 +317,16 @@ if ( is_multisite() ) : // check if system is multisite, if not do not run.
                 }
                 foreach ( $active_plugins as $plugin ) {
                     if ( $plugin === 'disciple-tools-network-dashboard/disciple-tools-network-dashboard.php' ) {
-                        dt_write_log('has active nd: ' . $site );
+                        $active_sites[] = get_blog_details( $site );
                     }
                 }
             }
+            return $active_sites;
 
-
-            ?>
-            <table class="widefat striped">
-                <thead>
-                <th>Sites with Network Dashboard Activated</th>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-            <?php
         }
 
-    }
+    } // end DT_Multisite_Tab_Network_Dashboard class
+
+
 
 endif; // end multisite check wrapper
