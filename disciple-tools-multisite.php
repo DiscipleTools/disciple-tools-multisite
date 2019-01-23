@@ -21,7 +21,6 @@ if ( is_multisite() ) : // check if system is multisite, if not do not run.
 
     function dt_new_blog_force_dt_theme( $blog_id, $user_id, $domain, $path, $site_id, $meta )
     {
-        define( 'WP_DEFAULT_THEME', 'disciple-tools-theme' );
         update_blog_option( $blog_id, 'template', 'disciple-tools-theme' );
         update_blog_option( $blog_id, 'stylesheet', 'disciple-tools-theme' );
         update_blog_option( $blog_id, 'current_theme', 'Disciple Tools' );
