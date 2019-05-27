@@ -7,7 +7,7 @@
  */
 
 /** Multisite wrapper */
-if ( is_multisite() ) : // check if system is multisite, if not do not run.
+if ( is_multisite() ) : // check if system is multi-site, if not do not run.
 
     function dt_multisite_token()
     {
@@ -103,6 +103,7 @@ if ( is_multisite() ) : // check if system is multisite, if not do not run.
                             <!-- Main Column -->
 
                             <?php $this->overview_message() ?>
+                            <?php $this->network_upgrade() ?>
 
                             <!-- End Main Column -->
                         </div><!-- end post-body-content -->
@@ -134,8 +135,85 @@ if ( is_multisite() ) : // check if system is multisite, if not do not run.
                 <tr>
                     <td>
                         <dl>
-                            <dt>Plugin Purpose</dt>
+                            <dt>This plugin serves the multi-site administrator with maintenance utility and management for a multi-site Disciple Tools installation.</dt>
                         </dl>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <!-- End Box -->
+            <?php
+        }
+
+        public function network_upgrade()
+        {
+            if ( isset( $_POST['network_upgrade_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['network_upgrade_nonce'] ) ), 'network_upgrade' ) ) {
+                if ( isset( $_POST['url_trigger'] ) ) {
+                    dt_write_log('url_trigger');
+
+                    global $wpdb;
+                    $table = $wpdb->base_prefix . 'blogs';
+                    $sites = $wpdb->get_col("SELECT blog_id FROM $table" );
+                    if ( ! empty( $sites ) ) {
+                        foreach ( $sites as $site ) {
+                            if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
+                                $url = get_blog_option( $site, 'siteurl' );
+                                $response = wp_remote_head( $url );
+                                dt_write_log( $response );
+                            }
+                        }
+                    }
+                }
+
+                if ( isset( $_POST['programmatic_trigger'] ) ) {
+                    dt_write_log('programmatic_trigger');
+
+                    global $wpdb;
+                    $table = $wpdb->base_prefix . 'blogs';
+                    $sites = $wpdb->get_col("SELECT blog_id FROM $table" );
+                    if ( ! empty( $sites ) ) {
+                        foreach ( $sites as $site ) {
+                            dt_write_log($site);
+                            if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
+                                switch_to_blog( $site );
+
+                                require( $_SERVER[ 'DOCUMENT_ROOT' ] . '/wp-load.php' ); // loads the wp framework when called
+                                require_once ( get_template_directory() . '/functions.php' );
+                                disciple_tools();
+
+                                restore_current_blog();
+                                dt_write_log( $response );
+                            }
+                        }
+                    }
+                }
+            }
+
+            ?>
+            <!-- Box -->
+            <table class="widefat striped">
+                <thead>
+                <th>Network Upgrade</th>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <dl>
+                            <dt>Because Disciple Tools uses migrations for the system that run only when the site is visited, in a multi-site installation
+                            you can have various sites in the multi-site at different migration levels. This utility programmatically runs through all the
+                            Disciple Tools sites in the multi-site system and triggers their load and therefore any remaining migrations.</dt>
+                        </dl>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post">
+                            <?php wp_nonce_field( 'network_upgrade', 'network_upgrade_nonce', false, true ) ?>
+                            <button type="submit" name="url_trigger" value="1">Trigger Sites through URL Call</button>
+                            <button type="submit" name="programmatic_trigger" value="1">Trigger Sites Programmatically</button>
+                        </form>
 
                     </td>
                 </tr>
