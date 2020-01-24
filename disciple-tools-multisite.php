@@ -9,8 +9,7 @@
 /** Multisite wrapper */
 if ( is_multisite() ) : // check if system is multi-site, if not do not run.
 
-    function dt_multisite_token()
-    {
+    function dt_multisite_token(){
         return 'disciple-tools-multisite';
     }
 
@@ -19,8 +18,7 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
      */
     define( 'WP_DEFAULT_THEME', 'disciple-tools-theme' );
 
-    function dt_new_blog_force_dt_theme( $blog_id, $user_id, $domain, $path, $site_id, $meta )
-    {
+    function dt_new_blog_force_dt_theme( $blog_id, $user_id, $domain, $path, $site_id, $meta ){
         update_blog_option( $blog_id, 'template', 'disciple-tools-theme' );
         update_blog_option( $blog_id, 'stylesheet', 'disciple-tools-theme' );
         update_blog_option( $blog_id, 'current_theme', 'Disciple Tools' );
@@ -28,25 +26,23 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
     add_action( 'wpmu_new_blog', 'dt_new_blog_force_dt_theme', 10, 6 );
     /** End Make Disciple.Tools Default */
 
-
+    require_once( "multisite-migration.php" );
 
     /**********************************************************************************************************************
      * ADMIN MENU
      */
-    function dt_multisite_network_admin_menu()
-    {
+    function dt_multisite_network_admin_menu(){
         add_menu_page( 'Disciple Tools', 'Disciple Tools', 'manage_options', dt_multisite_token(), 'dt_multisite_network_admin_content', 'dashicons-admin-tools' );
     }
     add_action( 'network_admin_menu', 'dt_multisite_network_admin_menu', 10, 2 );
 
-    function dt_multisite_network_admin_content()
-    {
+    function dt_multisite_network_admin_content(){
         if ( ! current_user_can( 'manage_options' ) ) { // manage dt is a permission that is specific to Disciple Tools and allows admins, strategists and dispatchers into the wp-admin
             wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.' ) );
         }
 
-        if ( isset( $_GET[ "tab" ] ) ) {
-            $tab = sanitize_key( wp_unslash( $_GET[ "tab" ] ) );
+        if ( isset( $_GET["tab"] ) ) {
+            $tab = sanitize_key( wp_unslash( $_GET["tab"] ) );
         } else {
             $tab = 'general';
         }
@@ -65,6 +61,10 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
                 <?php echo ( $tab == 'network' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
                     <?php echo esc_attr( 'Network Dashboard Settings' ) ?>
                 </a>
+                <a href="<?php echo esc_attr( $link ) . 'import' ?>" class="nav-tab
+                <?php echo ( $tab == 'import' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
+                    <?php echo esc_attr( 'Import Subsite' ) ?>
+                </a>
 
             </h2>
 
@@ -76,6 +76,10 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
                     break;
                 case "network":
                     $object = new DT_Multisite_Tab_Network_Dashboard();
+                    $object->content();
+                    break;
+                case "import":
+                    $object = new DT_Multisite_Tab_Import_Subsite();
                     $object->content();
                     break;
 
