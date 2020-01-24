@@ -3,7 +3,7 @@
  * Plugin Name: Disciple Tools - Multisite
  * Plugin URI:  https://github.com/DiscipleTools/disciple-tools-multisite
  * Description: Small plugin to be added to modify a multisite "Disciple Tools" environment.
- * Version:     1.0
+ * Version:     1.1
  */
 
 /** Multisite wrapper */
