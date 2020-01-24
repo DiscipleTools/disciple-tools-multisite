@@ -58,8 +58,8 @@ class DT_Multisite_Tab_Import_Subsite{
              * Add users
              */
             $users = $wpdb->get_results( "
-                    SELECT * FROM dt_tmp_migration_users
-                ", ARRAY_A );
+                SELECT * FROM dt_tmp_migration_users
+            ", ARRAY_A );
             if ( !$users ){
                 ?>
                 <h1>Expected to find table named "dt_tmp_migration_users" but table not found or something went wrong</h1>
@@ -76,22 +76,22 @@ class DT_Multisite_Tab_Import_Subsite{
                     if ( !$new_user_id ){
                         // copy user to users table
                         $copy_user = $wpdb->query( $wpdb->prepare( "
-                                INSERT INTO {$wpdb->users} 
-                                ( user_login, user_pass, user_nicename, user_email, user_url, user_registered, user_activation_key, user_status, display_name )
-                                SELECT user_login, user_pass, user_nicename, user_email, user_url, user_registered, user_activation_key, user_status, display_name
-                                FROM dt_tmp_migration_users
-                                WHERE ID = %s 
-                            ", $user["ID"] ) );
+                            INSERT INTO {$wpdb->users} 
+                            ( user_login, user_pass, user_nicename, user_email, user_url, user_registered, user_activation_key, user_status, display_name )
+                            SELECT user_login, user_pass, user_nicename, user_email, user_url, user_registered, user_activation_key, user_status, display_name
+                            FROM dt_tmp_migration_users
+                            WHERE ID = %s 
+                        ", $user["ID"] ) );
                         // get new id
                         $new_user = get_user_by( "email", $user["user_email"] );
                         $new_user_id = $new_user->ID;
                         // if $user_name_exits, replace with email.
                         if ( $user_name_exists ) {
                             $wpdb->query( $wpdb->prepare( "
-                                    UPDATE $wpdb->users
-                                    SET user_login = %s
-                                    WHERE ID = %s 
-                                ", strtolower( $user["user_email"] ), $new_user_id ) );
+                                UPDATE $wpdb->users
+                                SET user_login = %s
+                                WHERE ID = %s 
+                            ", strtolower( $user["user_email"] ), $new_user_id ) );
                         }
                     }
                     $cached["users"][$user["user_email"]] = [
@@ -183,9 +183,9 @@ class DT_Multisite_Tab_Import_Subsite{
             if ( !isset( $cached["options_keys"] ) ){
                 $table_name = $temp_table_prefix . "options";
                 $a = $wpdb->query($wpdb->prepare( "
-                        UPDATE $table_name SET
-                        option_name = REPLACE(option_name, %s, %s)
-                    ", $temp_table_prefix, $usermeta_site_key) );
+                    UPDATE $table_name SET
+                    option_name = REPLACE(option_name, %s, %s)
+                ", $temp_table_prefix, $usermeta_site_key) );
 
                 if ( !is_wp_error( $a )){
                     $cached["options_keys"] = true;
@@ -314,10 +314,10 @@ class DT_Multisite_Tab_Import_Subsite{
                 }
                 if ( !isset( $values["updated"]['shares'] ) ){
                     $a = $wpdb->query( $wpdb->prepare("
-                            UPDATE {$temp_table_prefix}dt_share SET
-                            user_id = %s
-                            WHERE user_id = %s
-                        ", $values["new"], $values["old"] ) );
+                        UPDATE {$temp_table_prefix}dt_share SET
+                        user_id = %s
+                        WHERE user_id = %s
+                    ", $values["new"], $values["old"] ) );
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["shares"] = true;
                         $cached["progress"]++;
@@ -326,10 +326,10 @@ class DT_Multisite_Tab_Import_Subsite{
                 }
                 if ( !isset( $values["updated"]['notifications'] ) ){
                     $a = $wpdb->query( $wpdb->prepare("
-                            UPDATE {$temp_table_prefix}dt_notifications SET
-                            user_id = %s
-                            WHERE user_id = %s
-                        ", $values["new"], $values["old"] ) );
+                        UPDATE {$temp_table_prefix}dt_notifications SET
+                        user_id = %s
+                        WHERE user_id = %s
+                    ", $values["new"], $values["old"] ) );
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["notifications"] = true;
                         $cached["progress"]++;
@@ -339,10 +339,10 @@ class DT_Multisite_Tab_Import_Subsite{
                 //@todo comment author?
                 if ( !isset( $values["updated"]['comments'] ) ){
                     $a = $wpdb->query( $wpdb->prepare("
-                            UPDATE {$temp_table_prefix}comments SET
-                            user_id = %s
-                            WHERE user_id = %s
-                        ", $values["new"], $values["old"] ) );
+                        UPDATE {$temp_table_prefix}comments SET
+                        user_id = %s
+                        WHERE user_id = %s
+                    ", $values["new"], $values["old"] ) );
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["comments"] = true;
                         $cached["progress"]++;
@@ -454,9 +454,9 @@ class DT_Multisite_Tab_Import_Subsite{
             if ( !isset( $cached["migrated"]["usermeta"] ) ){
 
                 $copy_user_meta = $wpdb->query( "
-                        INSERT INTO {$wpdb->usermeta} ( user_id, meta_key, meta_value )
-                        SELECT user_id, meta_key, meta_value FROM dt_tmp_migration_usermeta
-                    ");
+                    INSERT INTO {$wpdb->usermeta} ( user_id, meta_key, meta_value )
+                    SELECT user_id, meta_key, meta_value FROM dt_tmp_migration_usermeta
+                ");
                 if ( $copy_user_meta ){
                     $cached["migrated"]["usermeta"] = true;
                     $cached["progress"]++;
@@ -479,21 +479,21 @@ class DT_Multisite_Tab_Import_Subsite{
              * Copy, migrate and delete temporary tables tables
              */
             $existing_tables = $wpdb->get_results($wpdb->prepare( "
-                    SELECT table_name as table_name
-                    FROM information_schema.tables
-                    WHERE table_schema = %s 
-                    AND table_name LIKE %s
-                ", DB_NAME, $wpdb->base_prefix . $cached["site_id"] . '%'), ARRAY_A );
+                SELECT table_name as table_name
+                FROM information_schema.tables
+                WHERE table_schema = %s 
+                AND table_name LIKE %s
+            ", DB_NAME, $wpdb->base_prefix . $cached["site_id"] . '%'), ARRAY_A );
             $existing_table_names =[];
             foreach ( $existing_tables as $table ){
                 $existing_table_names[] = $table["table_name"];
             }
             $temp_tables = $wpdb->get_results($wpdb->prepare( "
-                    SELECT table_name as table_name
-                    FROM information_schema.tables
-                    WHERE table_schema = %s 
-                    AND table_name LIKE %s
-                ", DB_NAME, 'dt_tmp_migration_%' ), ARRAY_A );
+                SELECT table_name as table_name
+                FROM information_schema.tables
+                WHERE table_schema = %s 
+                AND table_name LIKE %s
+            ", DB_NAME, 'dt_tmp_migration_%' ), ARRAY_A );
             foreach ( $temp_tables as $table ){
                 $table_name = $table["table_name"];
                 if ( $table_name === "dt_tmp_migration_users" || $table_name === "dt_tmp_migration_usermeta" ) {
@@ -561,7 +561,7 @@ class DT_Multisite_Tab_Import_Subsite{
         ?>
         <?php if ( $finished_migration ) : ?>
             <h1>Finished migration for <?php echo esc_html( $finished_migration ) ?></h1>
-        <?php else: ?>
+        <?php else : ?>
             <?php if ( !isset( $cached["progress"] ) ) : ?>
                 <h2>Here are the instructions on how to migrate a D.T instance from a multisite or a single site into a multisite</h2>
 
@@ -588,7 +588,7 @@ class DT_Multisite_Tab_Import_Subsite{
                                     Replace "wp_" if you instances uses another prefix
                                 </p>
                                 <p>
-                                    Export the main tables<br>
+                                    Export the subsite specific tables<br>
                                     <code>mysqldump [DB_NAME] $(mysql -D [DB_NAME] -Bse "show tables like 'wp\_15\_%'") > dump.sql</code>
                                 </p>
                                 <p>
@@ -605,7 +605,7 @@ class DT_Multisite_Tab_Import_Subsite{
                     <li>
                         <strong>Replace domain names</strong><br>
                         <p>Ex domain: disciple.tools -> dtorg.local</p>
-                        <code>sed -i -e 's|https://disciple.tools|http://dtorg.local|g' -e 's|disciple\.tools|dtorg.local|g' dump.sql</code>
+                        <code>sed -i -e 's|https://disciple\.tools|http://dtorg.local|g' -e 's|disciple\.tools|dtorg.local|g' dump.sql</code>
                     </li>
                     <li>
                         <strong>Prepare the sql</strong><br>
@@ -615,8 +615,10 @@ class DT_Multisite_Tab_Import_Subsite{
                     </li>
                     <li>
                         <strong>Import the sql</strong><br>
+                        <p>Backup your database</p>
                         <p>Now on the server you want to import dump.sql into the database:</p>
                         <code>mysql [DB_NAME] < dump.sql</code>
+                        Delete the dump.sql file so it is not laying around.
                     </li>
                 </ol>
             <?php endif; ?>
