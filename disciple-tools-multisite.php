@@ -408,6 +408,34 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
 
     } // end DT_Multisite_Tab_Network_Dashboard class
 
+    /**
+     * Cleanup orphaned tables during site deletion
+     *
+     * @param $blog_id
+     * @param $drop
+     */
+    add_action( 'delete_blog', 'dt_delete_all_subsite_tables', 10, 2 );
+    function dt_delete_all_subsite_tables( $blog_id, $drop ) {
+
+        if ( true == $drop ) {
+
+            /**
+             * SELECT all tables relating to a specific blog id and add them to wpmu_drop_tables
+             */
+            global $wpdb;
+            $table_list = $wpdb->get_results( $wpdb->prepare( "
+                SELECT table_name as table_name FROM information_schema.TABLES WHERE table_name LIKE %s;
+            ", $wpdb->esc_like( "{$wpdb->base_prefix}{$blog_id}_" ) . '%' ),
+            ARRAY_A );
+
+            add_filter( 'wpmu_drop_tables', function ( $filter_list ) use ( $table_list ) {
+                foreach ( $table_list as $index => $data ) {
+                    $filter_list[] = $data['table_name'];
+                }
+                return array_unique( $filter_list );
+            } );
+        }
+    }
 
 
 endif; // end multisite check wrapper
