@@ -97,8 +97,7 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
      */
     class DT_Multisite_Tab_Overview
     {
-        public function content()
-        {
+        public function content(){
             ?>
             <div class="wrap">
                 <div id="poststuff">
@@ -124,8 +123,7 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
             <?php
         }
 
-        public function overview_message()
-        {
+        public function overview_message(){
             ?>
             <style>dt {
                     font-weight: bold;
@@ -133,7 +131,9 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
             <!-- Box -->
             <table class="widefat striped">
                 <thead>
+                <tr>
                 <th>Overview of Plugin</th>
+                </tr>
                 </thead>
                 <tbody>
                 <tr>
@@ -151,15 +151,14 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
             <?php
         }
 
-        public function network_upgrade()
-        {
+        public function network_upgrade(){
             if ( isset( $_POST['network_upgrade_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['network_upgrade_nonce'] ) ), 'network_upgrade' ) ) {
                 if ( isset( $_POST['url_trigger'] ) ) {
-                    dt_write_log('url_trigger');
+                    dt_write_log( 'url_trigger' );
 
                     global $wpdb;
-                    $table = $wpdb->base_prefix . 'blogs';
-                    $sites = $wpdb->get_col("SELECT blog_id FROM $table" );
+
+                    $sites = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->base_prefix}blogs;" );
                     if ( ! empty( $sites ) ) {
                         foreach ( $sites as $site ) {
                             if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
@@ -172,23 +171,22 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
                 }
 
                 if ( isset( $_POST['programmatic_trigger'] ) ) {
-                    dt_write_log('programmatic_trigger');
+                    dt_write_log( 'programmatic_trigger' );
 
                     global $wpdb;
-                    $table = $wpdb->base_prefix . 'blogs';
-                    $sites = $wpdb->get_col("SELECT blog_id FROM $table" );
+                    $sites = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->base_prefix}blogs" );
                     if ( ! empty( $sites ) ) {
                         foreach ( $sites as $site ) {
-                            dt_write_log($site);
+                            dt_write_log( $site );
                             if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
                                 switch_to_blog( $site );
 
-                                require( $_SERVER[ 'DOCUMENT_ROOT' ] . '/wp-load.php' ); // loads the wp framework when called
-                                require_once ( get_template_directory() . '/functions.php' );
+
+                                require( ABSPATH . '/wp-load.php' ); // loads the wp framework when called
+                                require_once( get_template_directory() . '/functions.php' );
                                 disciple_tools();
 
                                 restore_current_blog();
-                                dt_write_log( $response );
                             }
                         }
                     }
@@ -199,7 +197,9 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
             <!-- Box -->
             <table class="widefat striped">
                 <thead>
-                <th>Network Upgrade</th>
+                <tr>
+                    <th>Network Upgrade</th>
+                </tr>
                 </thead>
                 <tbody>
                 <tr>
@@ -234,8 +234,7 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
      */
     class DT_Multisite_Tab_Network_Dashboard
     {
-        public function content()
-        {
+        public function content(){
             // Checks that the Network Dashboard plugin is installed.
             $plugins_installed = get_plugins();
             if ( ! isset( $plugins_installed['disciple-tools-network-dashboard/disciple-tools-network-dashboard.php'] ) ) {
@@ -266,12 +265,13 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
             <?php
         }
 
-        public function main_column()
-        {
+        public function main_column(){
             ?>
             <table class="widefat striped">
                 <thead>
-                <th>Overview of Network Dashboard Plugin</th>
+                    <tr>
+                        <th>Overview of Network Dashboard Plugin</th>
+                    </tr>
                 </thead>
                 <tbody>
                 <tr>
@@ -331,7 +331,6 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
                     update_site_option( 'dt_dashboard_approved_sites', $enabled_sites );
                     $enabled_sites = get_site_option( 'dt_dashboard_approved_sites' );
                 }
-
             }
 
             // get enabled sites
@@ -344,33 +343,37 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
             // print table
             ?>
             <form method="post">
-                <?php wp_nonce_field('dashboards_approved_' . get_current_user_id(), 'dashboards_approved_nonce') ?>
+                <?php wp_nonce_field( 'dashboards_approved_' . get_current_user_id(), 'dashboards_approved_nonce' ) ?>
                 <strong>Sites with Network Dashboard Activated</strong>
                 <table class="widefat striped">
                     <thead>
-                    <th>ID</th>
-                    <th>Status</th>
-                    <th>Site Name</th>
-                    <th style="width:75px;text-align:center;">Action</th>
+                        <tr>
+                            <th>ID</th>
+                            <th>Status</th>
+                            <th>Site Name</th>
+                            <th style="width:75px;text-align:center;">Action</th>
+                        </tr>
                     </thead>
                     <tbody>
                         <?php
-                            foreach ( $active_sites as $value ) {
-                                if ( isset( $enabled_sites[$value->blog_id]['all'] ) && $enabled_sites[$value->blog_id]['all'] === true ) {
-                                    $action = '<button type="submit" class="button" style="background-color:red;border-color:red;color:white;" name="disable-all" value="'.$value->blog_id.'">Disable</button>';
-                                    $status = '&#9989;';
-                                } else {
-                                    $action = '<button type="submit" class="button" name="enable-all" value="'.$value->blog_id.'">Enable</button>';
-                                    $status = '<span style="font-size:1.5em;">&#10007;</span>';
-                                }
+                        foreach ( $active_sites as $value ) {
+                            echo '<tr>';
+                            echo '<td style="width:30px;">' . esc_html( $value->blog_id ) . '</td>';
 
-                                echo '<tr>';
-                                echo '<td style="width:30px;">' . $value->blog_id . '</td>';
-                                echo '<td style="width:30px;">'.$status.' </td>';
-                                echo '<td>' . $value->blogname . '</td>';
-                                echo '<td style="width:75px;text-align:center;">'.$action.'</td>';
-                                echo '</tr>';
+                            if ( isset( $enabled_sites[$value->blog_id]['all'] ) && $enabled_sites[$value->blog_id]['all'] === true ) {
+                                echo '<td style="width:30px;">&#9989;</td>';
+                                echo '<td>' . esc_html( $value->blogname ) . '</td>';
+                                echo '<td style="width:75px;text-align:center;">
+                                    <button type="submit" class="button" style="background-color:red;border-color:red;color:white;" name="disable-all" value="' . esc_html( $value->blog_id ) . '">Disable</button>
+                                </td>';
+                            } else {
+                                echo '<td style="width:30px;"><span style="font-size:1.5em;">&#10007;</span></td>';
+                                echo '<td>' . esc_html( $value->blogname ) . '</td>';
+                                echo '<td style="width:75px;text-align:center;"><button type="submit" class="button" name="enable-all" value="'.esc_html( $value->blog_id ).'">Enable</button></td>';
                             }
+
+                            echo '</tr>';
+                        }
                         ?>
                     </tbody>
                 </table>
@@ -384,8 +387,7 @@ if ( is_multisite() ) : // check if system is multi-site, if not do not run.
             $active_sites = [];
 
             // Get list of blogs with active network dashboards activated
-            $table = $wpdb->base_prefix . 'blogs';
-            $sites = $wpdb->get_col("SELECT blog_id FROM $table" );
+            $sites = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->base_prefix}blogs" );
             if ( empty( $sites ) ) {
                 return $active_sites;
             }
