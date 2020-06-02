@@ -2,7 +2,7 @@
 /**
  *
  */
-class DT_Multisite_Tab_Import_Subsite{
+class DT_Multisite_Tab_Import_Subsite {
     public function content() {
 
         global $wpdb;
@@ -12,12 +12,12 @@ class DT_Multisite_Tab_Import_Subsite{
             $temp_tables = $wpdb->get_results($wpdb->prepare( "
                     SELECT table_name as table_name
                     FROM information_schema.tables
-                    WHERE table_schema = %s 
+                    WHERE table_schema = %s
                     AND table_name LIKE %s
                 ", DB_NAME, 'dt_tmp_migration_%' ), ARRAY_A );
             foreach ( $temp_tables as $table ){
                 $table_name = $table["table_name"];
-                $wpdb->query( "DROP TABLE $table_name" );
+                $wpdb->query( "DROP TABLE $table_name" ); // phpcs:ignore
             }
             delete_option( "dt_import_migration" );
         }
@@ -76,11 +76,11 @@ class DT_Multisite_Tab_Import_Subsite{
                     if ( !$new_user_id ){
                         // copy user to users table
                         $copy_user = $wpdb->query( $wpdb->prepare( "
-                            INSERT INTO {$wpdb->users} 
+                            INSERT INTO {$wpdb->users}
                             ( user_login, user_pass, user_nicename, user_email, user_url, user_registered, user_activation_key, user_status, display_name )
                             SELECT user_login, user_pass, user_nicename, user_email, user_url, user_registered, user_activation_key, user_status, display_name
                             FROM dt_tmp_migration_users
-                            WHERE ID = %s 
+                            WHERE ID = %s
                         ", $user["ID"] ) );
                         // get new id
                         $new_user = get_user_by( "email", $user["user_email"] );
@@ -90,7 +90,7 @@ class DT_Multisite_Tab_Import_Subsite{
                             $wpdb->query( $wpdb->prepare( "
                                 UPDATE $wpdb->users
                                 SET user_login = %s
-                                WHERE ID = %s 
+                                WHERE ID = %s
                             ", strtolower( $user["user_email"] ), $new_user_id ) );
                         }
                     }
@@ -108,18 +108,20 @@ class DT_Multisite_Tab_Import_Subsite{
              */
             if ( !isset( $cached["site_id"] ) ) {
                 $table_name = $temp_table_prefix . "options";
+                // phpcs:disable
                 $admin_email = $wpdb->get_var("
-                    SELECT option_value 
+                    SELECT option_value
                     FROM $table_name
-                    WHERE option_name = 'admin_email'  
+                    WHERE option_name = 'admin_email'
                 ");
                 if ( !$new_site_name ){
                     $new_site_name = $wpdb->get_var("
-                        SELECT option_value 
+                        SELECT option_value
                         FROM $table_name
-                        WHERE option_name = 'blogname'  
+                        WHERE option_name = 'blogname'
                     ");
                 }
+                // phpcs:enable
                 $admin = get_user_by( "email", $admin_email );
 
 
@@ -137,12 +139,12 @@ class DT_Multisite_Tab_Import_Subsite{
                 }
                 $wpdb->dt_options_table_name = $table_name;
                 $wpdb->query( $wpdb->prepare( "
-                    UPDATE $wpdb->dt_options_table_name SET 
+                    UPDATE $wpdb->dt_options_table_name SET
                     option_value = %s
                     WHERE option_name = 'siteurl'
                 ", $site_url ));
                 $wpdb->query( $wpdb->prepare( "
-                    UPDATE $wpdb->dt_options_table_name SET 
+                    UPDATE $wpdb->dt_options_table_name SET
                     option_value = %s
                     WHERE option_name = 'home'
                 ", $site_url ));
@@ -182,10 +184,13 @@ class DT_Multisite_Tab_Import_Subsite{
             }
             if ( !isset( $cached["options_keys"] ) ){
                 $table_name = $temp_table_prefix . "options";
+
+                // phpcs:disable
                 $a = $wpdb->query($wpdb->prepare( "
                     UPDATE $table_name SET
                     option_name = REPLACE(option_name, %s, %s)
                 ", $temp_table_prefix, $usermeta_site_key) );
+                // phpcs:enable
 
                 if ( !is_wp_error( $a )){
                     $cached["options_keys"] = true;
@@ -218,11 +223,13 @@ class DT_Multisite_Tab_Import_Subsite{
 
                 //update posts user_id
                 if ( !isset( $values["updated"]['posts'] ) ){
+                    // phpcs:disable
                     $a = $wpdb->query( $wpdb->prepare("
                         UPDATE {$temp_table_prefix}posts SET
                         post_author = %s
                         WHERE post_author = %s
                     ", $values["new"], $values["old"] ) );
+                    // phpcs:enable
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["posts"] = true;
                         $cached["progress"]++;
@@ -230,12 +237,14 @@ class DT_Multisite_Tab_Import_Subsite{
                     }
                 }
                 if ( !isset( $values["updated"]['corresponds_to_user'] ) ){
+                    // phpcs:disable
                     $a = $wpdb->query( $wpdb->prepare("
                         UPDATE {$temp_table_prefix}postmeta SET
                         meta_value = %s
                         WHERE meta_key = 'corresponds_to_user'
                         AND meta_value = %s
                     ", $values["new"], $values["old"] ) );
+                    // phpcs:enable
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["corresponds_to_user"] = true;
                         $cached["progress"]++;
@@ -243,12 +252,14 @@ class DT_Multisite_Tab_Import_Subsite{
                     }
                 }
                 if ( !isset( $values["updated"]['assigned_to'] ) ){
+                    // phpcs:disable
                     $a = $wpdb->query( $wpdb->prepare("
                         UPDATE {$temp_table_prefix}postmeta SET
                         meta_value = %s
                         WHERE meta_key = 'assigned_to'
                         AND meta_value = %s
                     ", 'user-' . $values["new"], 'user-' . $values["old"] ) );
+                    // phpcs:enable
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["assigned_to"] = true;
                         $cached["progress"]++;
@@ -256,12 +267,14 @@ class DT_Multisite_Tab_Import_Subsite{
                     }
                 }
                 if ( !isset( $values["updated"]['base_user'] ) ){
+                    // phpcs:disable
                     $a = $wpdb->query( $wpdb->prepare("
                         UPDATE {$temp_table_prefix}options SET
                         option_value = %s
                         WHERE option_name = 'base_user'
                         AND option_value = %s
                     ", $values["new"], $values["old"] ) );
+                    // phpcs:enable
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["base_user"] = true;
                         $cached["progress"]++;
@@ -270,7 +283,7 @@ class DT_Multisite_Tab_Import_Subsite{
                 }
                 if ( !isset( $values["updated"]['saved_filters'] ) ){
                     $filters = $wpdb->get_var( $wpdb->prepare( "
-                        SELECT meta_value 
+                        SELECT meta_value
                         FROM dt_tmp_migration_usermeta
                         WHERE meta_key = %s
                         AND user_id = %s
@@ -313,11 +326,13 @@ class DT_Multisite_Tab_Import_Subsite{
                     update_option( "dt_import_migration", $cached );
                 }
                 if ( !isset( $values["updated"]['shares'] ) ){
+                    // phpcs:disable
                     $a = $wpdb->query( $wpdb->prepare("
                         UPDATE {$temp_table_prefix}dt_share SET
                         user_id = %s
                         WHERE user_id = %s
                     ", $values["new"], $values["old"] ) );
+                    // phpcs:enable
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["shares"] = true;
                         $cached["progress"]++;
@@ -325,11 +340,13 @@ class DT_Multisite_Tab_Import_Subsite{
                     }
                 }
                 if ( !isset( $values["updated"]['notifications'] ) ){
+                    // phpcs:disable
                     $a = $wpdb->query( $wpdb->prepare("
                         UPDATE {$temp_table_prefix}dt_notifications SET
                         user_id = %s
                         WHERE user_id = %s
                     ", $values["new"], $values["old"] ) );
+                    // phpcs:enable
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["notifications"] = true;
                         $cached["progress"]++;
@@ -338,11 +355,13 @@ class DT_Multisite_Tab_Import_Subsite{
                 }
                 //@todo comment author?
                 if ( !isset( $values["updated"]['comments'] ) ){
+                    // phpcs:disable
                     $a = $wpdb->query( $wpdb->prepare("
                         UPDATE {$temp_table_prefix}comments SET
                         user_id = %s
                         WHERE user_id = %s
                     ", $values["new"], $values["old"] ) );
+                    // phpcs:enable
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["comments"] = true;
                         $cached["progress"]++;
@@ -351,11 +370,13 @@ class DT_Multisite_Tab_Import_Subsite{
                 }
                 //comment @mentions
                 if ( !isset( $values["updated"]['comment_mentions'] ) ){
+                    // phpcs:disable
                     $a = $wpdb->query( $wpdb->prepare("
                         UPDATE {$temp_table_prefix}comments SET
                         comment_content = REPLACE( comment_content, %s, %s )
                         WHERE comment_content LIKE '%@[%'
                     ", ']('.$values["old"].')', ']('.$values["new"].')' ) );
+                    // phpcs:enable
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["comments_mentions"] = true;
                         $cached["progress"]++;
@@ -363,11 +384,13 @@ class DT_Multisite_Tab_Import_Subsite{
                     }
                 }
                 if ( !isset( $values["updated"]['activity_log'] ) ){
+                    // phpcs:disable
                     $a = $wpdb->query( $wpdb->prepare("
                         UPDATE {$temp_table_prefix}dt_activity_log SET
                         user_id = %s
                         WHERE user_id = %s
                     ", $values["new"], $values["old"] ) );
+                    // phpcs:enable
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["activity_log"] = true;
                         $cached["progress"]++;
@@ -375,11 +398,13 @@ class DT_Multisite_Tab_Import_Subsite{
                     }
                 }
                 if ( !isset( $values["updated"]['activity_log_assigned_to'] ) ) {
+                    // phpcs:disable
                     $a = $wpdb->query( $wpdb->prepare( "
                         UPDATE {$temp_table_prefix}dt_activity_log SET
                         meta_value = %s
                         WHERE meta_value = %s
                     ", 'user-' . $values["new"], 'user-' . $values["old"] ) );
+                    // phpcs:enable
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["activity_log_assigned_to"] = true;
                         $cached["progress"]++;
@@ -387,12 +412,14 @@ class DT_Multisite_Tab_Import_Subsite{
                     }
                 }
                 if ( !isset( $values["updated"]['activity_log_assigned_to'] ) ){
+                    // phpcs:disable
                     $a = $wpdb->query( $wpdb->prepare("
                         UPDATE {$temp_table_prefix}dt_activity_log SET
                         meta_value = %s
                         WHERE meta_value = %s
                         AND meta_key = 'corresponds_to_user'
                     ", $values["new"], $values["old"] ) );
+                    // phpcs:enable
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["activity_log_assigned_to"] = true;
                         $cached["progress"]++;
@@ -400,12 +427,14 @@ class DT_Multisite_Tab_Import_Subsite{
                     }
                 }
                 if ( !isset( $values["updated"]['activity_log_users'] ) ){
+                    // phpcs:disable
                     $a = $wpdb->query( $wpdb->prepare("
                         UPDATE {$temp_table_prefix}dt_activity_log SET
                         object_id = %s
                         WHERE object_type = 'User'
                         AND object_id = %s
                     ", $values["new"], $values["old"] ) );
+                    // phpcs:enable
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["activity_log_users"] = true;
                         $cached["progress"]++;
@@ -413,11 +442,13 @@ class DT_Multisite_Tab_Import_Subsite{
                     }
                 }
                 if ( !isset( $values["updated"]['post_user_meta'] ) ){
+                    // phpcs:disable
                     $a = $wpdb->query( $wpdb->prepare("
                         UPDATE {$temp_table_prefix}dt_post_user_meta SET
                         user_id = %s
                         WHERE user_id = %s
                     ", $values["new"], $values["old"] ) );
+                    // phpcs:enable
                     if ( !is_wp_error( $a )) {
                         $cached["users"][$user_email]["updated"]["post_user_meta"] = true;
                         $cached["progress"]++;
@@ -452,11 +483,12 @@ class DT_Multisite_Tab_Import_Subsite{
 
             //copy usermeta table
             if ( !isset( $cached["migrated"]["usermeta"] ) ){
-
+                // phpcs:disable
                 $copy_user_meta = $wpdb->query( "
                     INSERT INTO {$wpdb->usermeta} ( user_id, meta_key, meta_value )
                     SELECT user_id, meta_key, meta_value FROM dt_tmp_migration_usermeta
                 ");
+                // phpcs:enable
                 if ( $copy_user_meta ){
                     $cached["migrated"]["usermeta"] = true;
                     $cached["progress"]++;
@@ -481,7 +513,7 @@ class DT_Multisite_Tab_Import_Subsite{
             $existing_tables = $wpdb->get_results($wpdb->prepare( "
                 SELECT table_name as table_name
                 FROM information_schema.tables
-                WHERE table_schema = %s 
+                WHERE table_schema = %s
                 AND table_name LIKE %s
             ", DB_NAME, $wpdb->base_prefix . $cached["site_id"] . '%'), ARRAY_A );
             $existing_table_names =[];
@@ -491,21 +523,22 @@ class DT_Multisite_Tab_Import_Subsite{
             $temp_tables = $wpdb->get_results($wpdb->prepare( "
                 SELECT table_name as table_name
                 FROM information_schema.tables
-                WHERE table_schema = %s 
+                WHERE table_schema = %s
                 AND table_name LIKE %s
             ", DB_NAME, 'dt_tmp_migration_%' ), ARRAY_A );
             foreach ( $temp_tables as $table ){
                 $table_name = $table["table_name"];
                 if ( $table_name === "dt_tmp_migration_users" || $table_name === "dt_tmp_migration_usermeta" ) {
-                    $drop = $wpdb->query( "DROP TABLE $table_name" );
+                    $drop = $wpdb->query( "DROP TABLE $table_name" ); // phpcs:ignore
                     continue;
                 }
                 $table_name = str_replace( "dt_tmp_migration_", $wpdb->base_prefix . ( $cached["old_site_id"] ? '' : $cached["site_id"] . "_" ), $table_name );
                 $table_name = str_replace( $old_db_prefix, $wpdb->base_prefix, $table_name );
                 $table_name = str_replace( "_" . $old_site_id . "_", "_" . $cached["site_id"] . "_", $table_name );
 
+                // phpcs:disable
                 if ( in_array( $table_name, $existing_table_names ) ) {
-                    $drop = $wpdb->query( "DROP TABLE $table_name" );
+                    $drop = $wpdb->query( "DROP TABLE $table_name" ); // phpcs:ignore
                 }
                 $create = $wpdb->query("
                     CREATE TABLE $table_name LIKE {$table["table_name"]}
@@ -513,8 +546,9 @@ class DT_Multisite_Tab_Import_Subsite{
                 $copy_table = $wpdb->query( "
                     INSERT INTO $table_name SELECT * FROM {$table["table_name"]}
                 ");
+                // phpcs:enable
 
-                $wpdb->query( "DROP TABLE {$table["table_name"]}" );
+                $wpdb->query( "DROP TABLE {$table["table_name"]}" ); // phpcs:ignore
                 if ( !is_wp_error( $copy_table ) ){
                     $cached["migrated"][$table_name] = true;
                     $cached["progress"]++;
@@ -523,7 +557,6 @@ class DT_Multisite_Tab_Import_Subsite{
             }
             delete_option( "dt_import_migration" );
             $finished_migration = $cached["new_site_name"];
-
 
         }
 
@@ -542,8 +575,6 @@ class DT_Multisite_Tab_Import_Subsite{
                         </div><!-- end post-body-content -->
                         <div id="postbox-container-1" class="postbox-container">
                             <!-- Right Column -->
-
-                            <!--                                --><?php //$this->right_column(); ?>
 
                             <!-- End Right Column -->
                         </div><!-- postbox-container 1 -->
@@ -666,23 +697,4 @@ class DT_Multisite_Tab_Import_Subsite{
         <?php endif;
     }
 
-    public function right_column() {
-        ?>
-        <!-- Box -->
-        <table class="widefat striped">
-            <thead>
-            <tr><th>Information</th></tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>
-                    Content
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        <br>
-        <!-- End Box -->
-        <?php
-    }
 }

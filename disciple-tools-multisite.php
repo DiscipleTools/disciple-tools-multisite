@@ -1,570 +1,318 @@
 <?php
 /**
  * Plugin Name: Disciple Tools - Multisite
- * Plugin URI:  https://github.com/DiscipleTools/disciple-tools-multisite
- * Description: Small plugin to be added to modify a multisite "Disciple Tools" environment.
- * Version:     1.1
+ * Plugin URI: https://github.com/DiscipleTools/disciple-tools-starter-plugin
+ * Description: Disciple Tools - Multisite is intended to help developers and integrator jumpstart their extension
+ * of the Disciple Tools system.
+ * Version:  1.0
+ * Author URI: https://github.com/DiscipleTools
+ * GitHub Plugin URI: https://github.com/DiscipleTools/disciple-tools-starter-plugin
+ * Requires at least: 4.7.0
+ * (Requires 4.7+ because of the integration of the REST API at 4.7 and the security requirements of this milestone version.)
+ * Tested up to: 5.4
+ *
+ * @package Disciple_Tools
+ * @link    https://github.com/DiscipleTools
+ * @license GPL-2.0 or later
+ *          https://www.gnu.org/licenses/gpl-2.0.html
  */
 
-/** Multisite wrapper */
-if ( is_multisite() ) : // check if system is multi-site, if not do not run.
 
-    function dt_multisite_token(){
-        return 'disciple-tools-multisite';
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly
+}
+
+/**********************************************************************************************************************
+ * MAKE DISCIPLE TOOLS DEFAULT THEME
+ */
+define( 'WP_DEFAULT_THEME', 'disciple-tools-theme' );
+add_action( 'wpmu_new_blog', 'dt_new_blog_force_dt_theme', 10, 6 );
+function dt_new_blog_force_dt_theme( $blog_id, $user_id, $domain, $path, $site_id, $meta ){
+    update_blog_option( $blog_id, 'template', 'disciple-tools-theme' );
+    update_blog_option( $blog_id, 'stylesheet', 'disciple-tools-theme' );
+    update_blog_option( $blog_id, 'current_theme', 'Disciple Tools' );
+}
+/** End */
+
+/**
+ * Gets the instance of the `DT_Multisite` class.
+ *
+ * @since  0.1
+ * @access public
+ * @return object|bool
+ */
+function dt_multisite() {
+    if ( is_multisite() && is_network_admin() ) {
+        return DT_Multisite::get_instance();
     }
+    return false;
+}
+add_action( 'init', 'dt_multisite' );
 
-    /**********************************************************************************************************************
-     * MAKE DISCIPLE TOOLS DEFAULT THEME
-     */
-    define( 'WP_DEFAULT_THEME', 'disciple-tools-theme' );
-
-    function dt_new_blog_force_dt_theme( $blog_id, $user_id, $domain, $path, $site_id, $meta ){
-        update_blog_option( $blog_id, 'template', 'disciple-tools-theme' );
-        update_blog_option( $blog_id, 'stylesheet', 'disciple-tools-theme' );
-        update_blog_option( $blog_id, 'current_theme', 'Disciple Tools' );
-    }
-    add_action( 'wpmu_new_blog', 'dt_new_blog_force_dt_theme', 10, 6 );
-    /** End Make Disciple.Tools Default */
-
-    require_once( "multisite-migration.php" );
-
-    /**********************************************************************************************************************
-     * ADMIN MENU
-     */
-    function dt_multisite_network_admin_menu(){
-        add_menu_page( 'Disciple Tools', 'Disciple Tools', 'manage_options', dt_multisite_token(), 'dt_multisite_network_admin_content', 'dashicons-admin-tools' );
-    }
-    add_action( 'network_admin_menu', 'dt_multisite_network_admin_menu', 10, 2 );
-
-    function dt_multisite_network_admin_content(){
-        if ( ! current_user_can( 'manage_options' ) ) { // manage dt is a permission that is specific to Disciple Tools and allows admins, strategists and dispatchers into the wp-admin
-            wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.' ) );
-        }
-
-        if ( isset( $_GET["tab"] ) ) {
-            $tab = sanitize_key( wp_unslash( $_GET["tab"] ) );
-        } else {
-            $tab = 'general';
-        }
-
-        $link = 'admin.php?page=' . esc_html( dt_multisite_token() ) . '&tab=';
-
-        ?>
-        <div class="wrap">
-            <h2><?php echo esc_html( 'Disciple Tools Multisite Configuration' ) ?></h2>
-            <h2 class="nav-tab-wrapper">
-                <a href="<?php echo esc_attr( $link ) . 'general' ?>" class="nav-tab
-                <?php echo ( $tab == 'general' || ! isset( $tab ) ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
-                    <?php echo esc_attr( 'Overview' ) ?></a>
-
-                <a href="<?php echo esc_attr( $link ) . 'network' ?>" class="nav-tab
-                <?php echo ( $tab == 'network' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
-                    <?php echo esc_attr( 'Network Dashboard Settings' ) ?>
-                </a>
-                <a href="<?php echo esc_attr( $link ) . 'import' ?>" class="nav-tab
-                <?php echo ( $tab == 'import' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
-                    <?php echo esc_attr( 'Import Subsite' ) ?>
-                </a>
-                <a href="<?php echo esc_attr( $link ) . 'mapbox_keys' ?>" class="nav-tab
-                <?php echo ( $tab == 'mapbox_keys' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
-                    <?php echo esc_attr( 'Mapbox Keys' ) ?>
-                </a>
-
-            </h2>
-
-            <?php
-            switch ( $tab ) {
-                case "general":
-                    $object = new DT_Multisite_Tab_Overview();
-                    $object->content();
-                    break;
-                case "network":
-                    $object = new DT_Multisite_Tab_Network_Dashboard();
-                    $object->content();
-                    break;
-                case "import":
-                    $object = new DT_Multisite_Tab_Import_Subsite();
-                    $object->content();
-                    break;
-                case "mapbox_keys":
-                    $object = new DT_Multisite_Tab_Mapbox_Keys();
-                    $object->content();
-                    break;
-
-                default:
-                    break;
-            }
-            ?>
-        </div><!-- End wrap -->
-        <?php
-    }
-    /** End Network Dashboard Features */
+/**
+ * Singleton class for setting up the plugin.
+ *
+ * @since  0.1
+ * @access public
+ */
+class DT_Multisite {
 
     /**
-     * Class DT_Starter_Tab_Second
-     */
-    class DT_Multisite_Tab_Overview
-    {
-        public function content(){
-            ?>
-            <div class="wrap">
-                <div id="poststuff">
-                    <div id="post-body" class="metabox-holder columns-2">
-                        <div id="post-body-content">
-                            <!-- Main Column -->
-
-                            <?php $this->overview_message() ?>
-                            <?php $this->network_upgrade() ?>
-
-                            <!-- End Main Column -->
-                        </div><!-- end post-body-content -->
-                        <div id="postbox-container-1" class="postbox-container">
-                            <!-- Right Column -->
-
-                            <!-- End Right Column -->
-                        </div><!-- postbox-container 1 -->
-                        <div id="postbox-container-2" class="postbox-container">
-                        </div><!-- postbox-container 2 -->
-                    </div><!-- post-body meta box container -->
-                </div><!--poststuff end -->
-            </div><!-- wrap end -->
-            <?php
-        }
-
-        public function overview_message(){
-            ?>
-            <style>dt {
-                    font-weight: bold;
-                }</style>
-            <!-- Box -->
-            <table class="widefat striped">
-                <thead>
-                <tr>
-                <th>Overview of Plugin</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>
-                        <dl>
-                            <dt>This plugin serves the multi-site administrator with maintenance utility and management for a multi-site Disciple Tools installation.</dt>
-                        </dl>
-
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-            <!-- End Box -->
-            <?php
-        }
-
-        public function network_upgrade(){
-            if ( isset( $_POST['network_upgrade_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['network_upgrade_nonce'] ) ), 'network_upgrade' ) ) {
-                if ( isset( $_POST['url_trigger'] ) ) {
-                    dt_write_log( 'url_trigger' );
-
-                    global $wpdb;
-
-                    $sites = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->base_prefix}blogs;" );
-                    if ( ! empty( $sites ) ) {
-                        foreach ( $sites as $site ) {
-                            if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
-                                $url = get_blog_option( $site, 'siteurl' );
-                                $response = wp_remote_head( $url );
-                                dt_write_log( $response );
-                            }
-                        }
-                    }
-                }
-
-                if ( isset( $_POST['programmatic_trigger'] ) ) {
-                    dt_write_log( 'programmatic_trigger' );
-
-                    global $wpdb;
-                    $sites = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->base_prefix}blogs" );
-                    if ( ! empty( $sites ) ) {
-                        foreach ( $sites as $site ) {
-                            dt_write_log( $site );
-                            if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
-                                switch_to_blog( $site );
-
-
-                                require( ABSPATH . '/wp-load.php' ); // loads the wp framework when called
-                                require_once( get_template_directory() . '/functions.php' );
-                                disciple_tools();
-
-                                restore_current_blog();
-                            }
-                        }
-                    }
-                }
-            }
-
-            ?>
-            <!-- Box -->
-            <table class="widefat striped">
-                <thead>
-                <tr>
-                    <th>Network Upgrade</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>
-                        <dl>
-                            <dt>Because Disciple Tools uses migrations for the system that run only when the site is visited, in a multi-site installation
-                            you can have various sites in the multi-site at different migration levels. This utility programmatically runs through all the
-                            Disciple Tools sites in the multi-site system and triggers their load and therefore any remaining migrations.</dt>
-                        </dl>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <form method="post">
-                            <?php wp_nonce_field( 'network_upgrade', 'network_upgrade_nonce', false, true ) ?>
-                            <button type="submit" name="url_trigger" value="1">Trigger Sites through URL Call</button>
-                            <button type="submit" name="programmatic_trigger" value="1">Trigger Sites Programmatically</button>
-                        </form>
-
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-            <!-- End Box -->
-            <?php
-        }
-    }
-
-    /**
-     * Class DT_Starter_Tab_Second
-     */
-    class DT_Multisite_Tab_Mapbox_Keys
-    {
-        public function content(){
-            $this->process_post();
-            ?>
-            <div class="wrap">
-                <div id="poststuff">
-                    <div id="post-body" class="metabox-holder columns-2">
-                        <div id="post-body-content">
-                            <!-- Main Column -->
-
-                            <?php $this->list_keys() ?>
-
-                            <!-- End Main Column -->
-                        </div><!-- end post-body-content -->
-                        <div id="postbox-container-1" class="postbox-container">
-                            <!-- Right Column -->
-
-                            <!-- End Right Column -->
-                        </div><!-- postbox-container 1 -->
-                        <div id="postbox-container-2" class="postbox-container">
-                        </div><!-- postbox-container 2 -->
-                    </div><!-- post-body meta box container -->
-                </div><!--poststuff end -->
-            </div><!-- wrap end -->
-            <?php
-        }
-
-        public function process_post() {
-            if ( isset( $_POST['mapbox_nonce'] )
-                && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mapbox_nonce'] ) ), 'mapbox' ) ) {
-
-                if ( isset( $_POST['site_id'] ) && ! empty( $_POST['site_id'] ) ) {
-                    $site_id = sanitize_text_field( wp_unslash( $_POST['site_id'] ) );
-
-                    if ( isset( $_POST['mapbox_key'] ) && empty( $_POST['mapbox_key'] ) ) {
-                        update_blog_option( $site_id, 'dt_mapbox_api_key', '' );
-                    } else {
-                        update_blog_option( $site_id, 'dt_mapbox_api_key', sanitize_text_field( wp_unslash( $_POST['mapbox_key'] ) ) );
-                    }
-                }
-
-
-            }
-        }
-
-        public function list_keys(){
-            global $wpdb;
-
-            $sites = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->base_prefix}blogs;" );
-            $list = [];
-            $list['count'] = 0;
-            if ( ! empty( $sites ) ) {
-                foreach ( $sites as $site ) {
-                    if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
-                        $list[$site] = [];
-                        $list[$site]['url'] = get_blog_option( $site, 'siteurl' );
-                        $list[$site]['mapbox_key'] = get_blog_option( $site, 'dt_mapbox_api_key' );
-                        $list['count']++;
-                    }
-                }
-            }
-
-            ?>
-            <!-- Box -->
-            <table class="widefat striped">
-                <thead>
-                <tr>
-                <th>Site Name (<?php echo $list['count']; ?>)</th>
-                <th>Keys</th>
-                <th></th>
-                </tr>
-                </thead>
-                <tbody>
-
-                <?php if ( ! empty( $list ) ) : unset( $list['count'] ); foreach ( $list as $id => $site ) : ?>
-                    <form method="post">
-                    <tr>
-                        <td style="width:30%;">
-                            <?php echo $site['url'] ?>
-                        </td>
-                        <td>
-                            <?php wp_nonce_field( 'mapbox', 'mapbox_nonce') ?>
-                            <input type="hidden" name="site_id" value="<?php echo $id ?>" />
-                            <input type="text" class="regular-text" style="width:100%;" value="<?php echo $site['mapbox_key'] ?>" name="mapbox_key" placeholder="add mapbox key" />
-                        </td>
-                        <td style="width:10%;">
-                            <button class="button btn" type="submit">Update</button>
-                        </td>
-                    </tr>
-                    </form>
-                <?php endforeach; endif; ?>
-                </tbody>
-            </table>
-            <br>
-            <!-- End Box -->
-            <?php
-        }
-
-
-    }
-
-    /**
+     * Declares public variables
      *
+     * @since  0.1
+     * @access public
+     * @return object
      */
-    class DT_Multisite_Tab_Network_Dashboard
-    {
-        public function content(){
-            // Checks that the Network Dashboard plugin is installed.
-            $plugins_installed = get_plugins();
-            if ( ! isset( $plugins_installed['disciple-tools-network-dashboard/disciple-tools-network-dashboard.php'] ) ) {
-                $mu_plugins = get_mu_plugins();
-                if ( ! isset( $mu_plugins['disciple-tools-network-dashboard/disciple-tools-network-dashboard.php'] ) ) {
-                    echo 'Network Dashboard plugin for Disciple Tools is not installed.<br>';
-                    echo '<a href="https://github.com/DiscipleTools/disciple-tools-network-dashboard" target="_blank">Download the Network Dashboard Plugin</a>';
-                    return;
-                }
-            }
-
-            ?>
-            <div class="wrap">
-                <div id="poststuff">
-                    <div id="post-body" class="metabox-holder columns-1">
-                        <div id="post-body-content">
-                            <!-- Main Column -->
-
-                            <?php $this->sites_with_network_dashboard() ?>
-                            <?php $this->main_column() ?>
-
-                            <!-- End Main Column -->
-                        </div><!-- end post-body-content -->
-
-                    </div><!-- post-body meta box container -->
-                </div><!--poststuff end -->
-            </div><!-- wrap end -->
-            <?php
-        }
-
-        public function main_column(){
-            ?>
-            <table class="widefat striped">
-                <thead>
-                    <tr>
-                        <th>Overview of Network Dashboard Plugin</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>
-                        <strong>Features</strong>
-                        <ol>
-
-                            <li>The Network Dashboard Plugin can be independently installed in individual sites within the
-                            multisite network. It can setup remote sites independently, which requires agreement from the
-                            corresponding site to make a site-to-site connection and provide reporting data. This kind of
-                            reporting down not require permission at a network level.</li>
-                            <li>The Network Dashboard Plugin can also be given permission to gather reports from the
-                            multisite network. This permission is controled on this panel by super admins of the network.
-                            If permission is enabled, the network dashboard will have a new tab appear in the admin panel
-                            and will be able to collect reports from all sites it has been given permission to gather
-                            reports from.</li>
-                            <li>The need this is addressing is the fluid nature of org structures. Where one group might
-                            need to get reporting from a subset of all the Disciple Tools systems on the multisite, and
-                            another might need reporting on all the systems in the Disciple Tools multisite.</li>
-                            <li>Enabling permission to a Network Dashboard of a certain site, allows it to collect reports
-                            even if the "Network Dashboard" setting has not been enabled or a site-to-site connection
-                            has been made. This becomes an advantage for a network administrator and reduces the
-                            required setup for a site-to-site connection.</li>
-                        </ol>
-
-                        <br>
-                        <a href="https://github.com/DiscipleTools/disciple-tools-network-dashboard" target="_blank">Download the Network Dashboard Plugin from Github</a>
-
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-            <?php
-        }
-
-        public function sites_with_network_dashboard() {
-
-            // process post
-            $enabled_sites = get_site_option( 'dt_dashboard_approved_sites' );
-            if ( isset( $_POST['dashboards_approved_nonce'] )
-                && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['dashboards_approved_nonce'] ) ), 'dashboards_approved_' . get_current_user_id() ) ) {
-
-                if ( isset( $_POST['enable-all'] ) && ! empty( $_POST['enable-all'] ) ) {
-                    $site_id = sanitize_key( wp_unslash( $_POST['enable-all'] ) );
-                    $enabled_sites[$site_id] = [
-                          'all' => true,
-                          'include_only' => []
-                    ];
-                    update_site_option( 'dt_dashboard_approved_sites', $enabled_sites );
-                    $enabled_sites = get_site_option( 'dt_dashboard_approved_sites' );
-                }
-
-                if ( isset( $_POST['disable-all'] ) && ! empty( $_POST['disable-all'] ) ) {
-                    $site_id = sanitize_key( wp_unslash( $_POST['disable-all'] ) );
-                    unset( $enabled_sites[$site_id] );
-                    update_site_option( 'dt_dashboard_approved_sites', $enabled_sites );
-                    $enabled_sites = get_site_option( 'dt_dashboard_approved_sites' );
-                }
-            }
-
-            // get enabled sites
-            $active_sites = $this->get_dashboard_activated_sites();
-            if ( empty( $active_sites ) ) {
-                echo 'No sites found to have activated network dashboard plugin';
-                return;
-            }
-
-            // print table
-            ?>
-            <form method="post">
-                <?php wp_nonce_field( 'dashboards_approved_' . get_current_user_id(), 'dashboards_approved_nonce' ) ?>
-                <strong>Sites with Network Dashboard Activated</strong>
-                <table class="widefat striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Status</th>
-                            <th>Site Name</th>
-                            <th style="width:75px;text-align:center;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        foreach ( $active_sites as $value ) {
-                            echo '<tr>';
-                            echo '<td style="width:30px;">' . esc_html( $value->blog_id ) . '</td>';
-
-                            if ( isset( $enabled_sites[$value->blog_id]['all'] ) && $enabled_sites[$value->blog_id]['all'] === true ) {
-                                echo '<td style="width:30px;">&#9989;</td>';
-                                echo '<td>' . esc_html( $value->blogname ) . '</td>';
-                                echo '<td style="width:75px;text-align:center;">
-                                    <button type="submit" class="button" style="background-color:red;border-color:red;color:white;" name="disable-all" value="' . esc_html( $value->blog_id ) . '">Disable</button>
-                                </td>';
-                            } else {
-                                echo '<td style="width:30px;"><span style="font-size:1.5em;">&#10007;</span></td>';
-                                echo '<td>' . esc_html( $value->blogname ) . '</td>';
-                                echo '<td style="width:75px;text-align:center;"><button type="submit" class="button" name="enable-all" value="'.esc_html( $value->blog_id ).'">Enable</button></td>';
-                            }
-
-                            echo '</tr>';
-                        }
-                        ?>
-                    </tbody>
-                </table>
-                <br>
-            </form>
-            <?php
-        }
-
-        public function get_dashboard_activated_sites() {
-            global $wpdb;
-            $active_sites = [];
-
-            // Get list of blogs with active network dashboards activated
-            $sites = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->base_prefix}blogs" );
-            if ( empty( $sites ) ) {
-                return $active_sites;
-            }
-
-            foreach ( $sites as $site ) {
-                $active_plugins = get_blog_option( $site, 'active_plugins' );
-
-                if ( empty( $active_plugins ) ) {
-                    continue;
-                }
-                foreach ( $active_plugins as $plugin ) {
-                    if ( $plugin === 'disciple-tools-network-dashboard/disciple-tools-network-dashboard.php' ) {
-                        $active_sites[] = get_blog_details( $site );
-                    }
-                }
-            }
-            return $active_sites;
-
-        }
-
-    } // end DT_Multisite_Tab_Network_Dashboard class
+    public $token;
+    public $version;
+    public $dir_path = '';
+    public $dir_uri = '';
+    public $img_uri = '';
+    public $includes_path;
 
     /**
-     * Cleanup orphaned tables during site deletion
+     * Returns the instance.
      *
-     * @param $blog_id
-     * @param $drop
+     * @since  0.1
+     * @access public
+     * @return object
      */
-    add_action( 'wp_delete_site', 'dt_delete_all_subsite_tables', 10, 2 );
-    function dt_delete_all_subsite_tables( $old_site ) {
+    public static function get_instance() {
 
-        /**
-         * SELECT all tables relating to a specific blog id and add them to wpmu_drop_tables
-         */
-        global $wpdb;
-        $table_list = $wpdb->get_col( $wpdb->prepare( "
-                SELECT table_name as table_name FROM information_schema.TABLES WHERE table_name LIKE %s;
-            ", $wpdb->esc_like( "{$wpdb->base_prefix}{$old_site->id}_" ) . '%' ) );
+        static $instance = null;
 
-        foreach ( $table_list as $tb ) {
-            $wpdb->query("DROP TABLE IF EXISTS {$tb}" );
+        if ( is_null( $instance ) ) {
+            $instance = new dt_multisite();
+            $instance->setup();
+            $instance->includes();
+            $instance->setup_actions();
+        }
+        return $instance;
+    }
+
+    /**
+     * Constructor method.
+     *
+     * @since  0.1
+     * @access private
+     * @return void
+     */
+    private function __construct() {
+    }
+
+    /**
+     * Loads files needed by the plugin.
+     *
+     * @since  0.1
+     * @access public
+     * @return void
+     */
+    private function includes() {
+        if ( is_multisite() && is_network_admin() ) {
+            require_once( 'includes/tab-overview.php' );
+            require_once( 'includes/tab-network-dashboard.php' );
+            require_once( 'includes/tab-mapbox-keys.php' );
+            require_once( 'includes/tab-multisite-migration.php' );
+            require_once( 'includes/admin-page.php' );
         }
     }
 
-    if ( ! function_exists( 'dt_write_log' ) ) {
-        // @note Included here because the module can be used independently
-        function dt_write_log( $log ) {
-            if ( true === WP_DEBUG ) {
-                global $dt_write_log_microtime;
-                $now = microtime( true );
-                if ( $dt_write_log_microtime > 0 ) {
-                    $elapsed_log = sprintf( "[elapsed:%5dms]", ( $now - $dt_write_log_microtime ) * 1000 );
-                } else {
-                    $elapsed_log = "[elapsed:-------]";
-                }
-                $dt_write_log_microtime = $now;
-                if ( is_array( $log ) || is_object( $log ) ) {
-                    error_log( $elapsed_log . " " . print_r( $log, true ) );
-                } else {
-                    error_log( "$elapsed_log $log" );
-                }
+    /**
+     * Sets up globals.
+     *
+     * @since  0.1
+     * @access public
+     * @return void
+     */
+    private function setup() {
+
+        // Main plugin directory path and URI.
+        $this->dir_path     = trailingslashit( plugin_dir_path( __FILE__ ) );
+        $this->dir_uri      = trailingslashit( plugin_dir_url( __FILE__ ) );
+
+        // Plugin directory paths.
+        $this->includes_path      = trailingslashit( $this->dir_path . 'includes' );
+
+        // Admin and settings variables
+        $this->token             = 'dt_multisite';
+        $this->version             = '1.0';
+
+    }
+
+    /**
+     * Sets up main plugin actions and filters.
+     *
+     * @since  0.1
+     * @access public
+     * @return void
+     */
+    private function setup_actions() {
+
+        if ( is_multisite() && is_network_admin() ) {
+
+            // Check for plugin updates
+            if ( ! class_exists( 'Puc_v4_Factory' ) ) {
+                require_once( 'includes/admin/plugin-update-checker/plugin-update-checker.php' );
+            }
+            /**
+             * Below is the publicly hosted .json file that carries the version information. This file can be hosted
+             * anywhere as long as it is publicly accessible. You can download the version file listed below and use it as
+             * a template.
+             * Also, see the instructions for version updating to understand the steps involved.
+             * @see https://github.com/DiscipleTools/disciple-tools-version-control/wiki/How-to-Update-the-Starter-Plugin
+             */
+            $hosted_json = "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/disciple-tools-multisite-version-control.json";
+            Puc_v4_Factory::buildUpdateChecker(
+                $hosted_json,
+                __FILE__,
+                'disciple-tools-multisite'
+            );
+        }
+
+        // Internationalize the text strings used.
+        add_action( 'init', array( $this, 'i18n' ), 2 );
+
+        if ( is_admin() || is_network_admin() ) {
+            // adds links to the plugin description area in the plugin admin list.
+            add_filter( 'plugin_row_meta', [ $this, 'plugin_description_links' ], 10, 4 );
+        }
+    }
+
+    /**
+     * Filters the array of row meta for each/specific plugin in the Plugins list table.
+     * Appends additional links below each/specific plugin on the plugins page.
+     *
+     * @access  public
+     * @param   array       $links_array            An array of the plugin's metadata
+     * @param   string      $plugin_file_name       Path to the plugin file
+     * @param   array       $plugin_data            An array of plugin data
+     * @param   string      $status                 Status of the plugin
+     * @return  array       $links_array
+     */
+    public function plugin_description_links( $links_array, $plugin_file_name, $plugin_data, $status ) {
+        if ( strpos( $plugin_file_name, basename( __FILE__ ) ) ) {
+            // You can still use `array_unshift()` to add links at the beginning.
+
+            $links_array[] = '<a href="https://disciple.tools">Disciple.Tools Community</a>'; // @todo replace with your links.
+
+            // add other links here
+        }
+
+        return $links_array;
+    }
+
+    /**
+     * Method that runs only when the plugin is activated.
+     *
+     * @since  0.1
+     * @access public
+     * @return void
+     */
+    public static function activation() {
+
+        // Confirm 'Administrator' has 'manage_dt' privilege. This is key in 'remote' configuration when
+        // Disciple Tools theme is not installed, otherwise this will already have been installed by the Disciple Tools Theme
+        $role = get_role( 'administrator' );
+        if ( !empty( $role ) ) {
+            $role->add_cap( 'manage_dt' ); // gives access to dt plugin options
+        }
+
+    }
+
+    /**
+     * Method that runs only when the plugin is deactivated.
+     *
+     * @since  0.1
+     * @access public
+     * @return void
+     */
+    public static function deactivation() {
+        delete_option( 'dismissed-dt-multisite' );
+    }
+
+    /**
+     * Loads the translation files.
+     *
+     * @since  0.1
+     * @access public
+     * @return void
+     */
+    public function i18n() {
+        load_plugin_textdomain( 'dt_multisite', false, trailingslashit( dirname( plugin_basename( __FILE__ ) ) ). 'languages' );
+    }
+
+    /**
+     * Magic method to output a string if trying to use the object as a string.
+     *
+     * @since  0.1
+     * @access public
+     * @return string
+     */
+    public function __toString() {
+        return 'dt_multisite';
+    }
+
+    /**
+     * Magic method to keep the object from being cloned.
+     *
+     * @since  0.1
+     * @access public
+     * @return void
+     */
+    public function __clone() {
+        _doing_it_wrong( __FUNCTION__, 'Whoah, partner!', '0.1' );
+    }
+
+    /**
+     * Magic method to keep the object from being unserialized.
+     *
+     * @since  0.1
+     * @access public
+     * @return void
+     */
+    public function __wakeup() {
+        _doing_it_wrong( __FUNCTION__, 'Whoah, partner!', '0.1' );
+    }
+
+    /**
+     * Magic method to prevent a fatal error when calling a method that doesn't exist.
+     *
+     * @param string $method
+     * @param array $args
+     * @return null
+     * @since  0.1
+     * @access public
+     */
+    public function __call( $method = '', $args = array() ) {
+        _doing_it_wrong( "dt_multisite::" . esc_html( $method ), 'Method does not exist.', '0.1' );
+        unset( $method, $args );
+        return null;
+    }
+}
+// end main plugin class
+
+// Register activation hook.
+register_activation_hook( __FILE__, [ 'DT_Multisite', 'activation' ] );
+register_deactivation_hook( __FILE__, [ 'DT_Multisite', 'deactivation' ] );
+
+if ( ! function_exists( 'dt_write_log' ) ) {
+    // @note Included here because the module can be used independently
+    function dt_write_log( $log ) {
+        if ( true === WP_DEBUG ) {
+            global $dt_write_log_microtime;
+            $now = microtime( true );
+            if ( $dt_write_log_microtime > 0 ) {
+                $elapsed_log = sprintf( "[elapsed:%5dms]", ( $now - $dt_write_log_microtime ) * 1000 );
+            } else {
+                $elapsed_log = "[elapsed:-------]";
+            }
+            $dt_write_log_microtime = $now;
+            if ( is_array( $log ) || is_object( $log ) ) {
+                error_log( $elapsed_log . " " . print_r( $log, true ) );
+            } else {
+                error_log( "$elapsed_log $log" );
             }
         }
     }
-
-
-endif; // end multisite check wrapper
+}

@@ -1,5 +1,5 @@
-# disciple-tools-multisite
-Snippets to assist multisite Disciple Tools installations.
+[![Build Status](https://travis-ci.com/DiscipleTools/disciple-tools-multisite-template.svg?branch=master)](https://travis-ci.com/DiscipleTools/disciple-tools-multisite)
 
-- Force every new subsite to use Disciple.Tools theme by default.
-- Add a network admin menu.
+# Disciple Tools Multisite
+This plugin is highly recommended for administrators running a multisite wordpress / Disciple Tools installation. It adds
+helpful Disciple Tools specific administrative tools.
