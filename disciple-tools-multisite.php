@@ -31,6 +31,13 @@ function dt_new_blog_force_dt_theme( $blog_id, $user_id, $domain, $path, $site_i
     update_blog_option( $blog_id, 'template', 'disciple-tools-theme' );
     update_blog_option( $blog_id, 'stylesheet', 'disciple-tools-theme' );
     update_blog_option( $blog_id, 'current_theme', 'Disciple Tools' );
+
+    // make sure blog administrators can add users or the add new users feature will not be available.
+    $add_users_enabled = get_site_option( 'add_new_users' );
+    if ( ! $add_users_enabled ) {
+        update_site_option('add_new_users', 1 );
+    }
+
 }
 /** End */
 
@@ -194,7 +201,9 @@ class DT_Multisite {
         if ( strpos( $plugin_file_name, basename( __FILE__ ) ) ) {
             // You can still use `array_unshift()` to add links at the beginning.
 
-            $links_array[] = '<a href="https://disciple.tools">Disciple.Tools Community</a>'; // @todo replace with your links.
+            $links_array[] = '<a href="https://disciple.tools/plugins/multisite/">Plugin Webpage</a>';
+            $links_array[] = '<a href="https://github.com/DiscipleTools/disciple-tools-multisite">Github Project</a>';
+            $links_array[] = '<a href="https://disciple.tools">Disciple.Tools Community</a>';
 
             // add other links here
         }
