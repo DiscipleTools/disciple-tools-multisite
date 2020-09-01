@@ -121,6 +121,7 @@ class DT_Multisite {
             require_once( 'includes/tab-network-dashboard.php' );
             require_once( 'includes/tab-mapbox-keys.php' );
             require_once( 'includes/tab-multisite-migration.php' );
+            require_once( 'includes/tab-movement-maps-stats-plugin.php' );
             require_once( 'includes/admin-page.php' );
         }
     }

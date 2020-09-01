@@ -24,6 +24,9 @@ function dt_multisite_network_admin_content(){
 
     $link = 'admin.php?page=' . esc_html( dt_multisite_token() ) . '&tab=';
 
+    $plugins_installed = get_plugins();
+    $mu_plugins = get_mu_plugins();
+
     ?>
     <div class="wrap">
         <h2><?php echo esc_html( 'Disciple Tools Multisite Configuration' ) ?></h2>
@@ -31,11 +34,6 @@ function dt_multisite_network_admin_content(){
             <a href="<?php echo esc_attr( $link ) . 'general' ?>" class="nav-tab
                 <?php echo ( $tab == 'general' || ! isset( $tab ) ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
                 <?php echo esc_attr( 'Overview' ) ?></a>
-
-            <a href="<?php echo esc_attr( $link ) . 'network' ?>" class="nav-tab
-                <?php echo ( $tab == 'network' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
-                <?php echo esc_attr( 'Network Dashboard Settings' ) ?>
-            </a>
             <a href="<?php echo esc_attr( $link ) . 'import' ?>" class="nav-tab
                 <?php echo ( $tab == 'import' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
                 <?php echo esc_attr( 'Import Subsite' ) ?>
@@ -44,6 +42,25 @@ function dt_multisite_network_admin_content(){
                 <?php echo ( $tab == 'mapbox_keys' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
                 <?php echo esc_attr( 'Mapbox Keys' ) ?>
             </a>
+            <?php
+            if ( isset( $plugins_installed['disciple-tools-network-dashboard/disciple-tools-network-dashboard.php'] ) || isset( $mu_plugins['disciple-tools-network-dashboard/disciple-tools-network-dashboard.php'] ) ) {
+                ?>
+                <a href="<?php echo esc_attr( $link ) . 'network' ?>" class="nav-tab
+                <?php echo ( $tab == 'network' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
+                    <?php echo esc_attr( 'Network Dashboard Plugin' ) ?>
+                </a>
+                <?php
+                // movement maps is dependent on network dashboard. So hide tab if network dashboard doesn't exist.
+                if ( isset( $plugins_installed['movement-maps-stats/movement-maps-stats.php'] ) || isset( $mu_plugins['movement-maps-stats/movement-maps-stats.php'] ) ) {
+                    ?>
+                    <a href="<?php echo esc_attr( $link ) . 'movement_maps' ?>" class="nav-tab
+                    <?php echo ( $tab == 'movement_maps' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
+                        <?php echo esc_attr( 'Movement Maps & Stats Plugin' ) ?>
+                    </a>
+                    <?php
+                }
+            }
+            ?>
 
         </h2>
 
@@ -63,6 +80,10 @@ function dt_multisite_network_admin_content(){
                 break;
             case "mapbox_keys":
                 $object = new DT_Multisite_Tab_Mapbox_Keys();
+                $object->content();
+                break;
+            case "movement_maps":
+                $object = new DT_Movement_Maps_Tab_Network_Dashboard();
                 $object->content();
                 break;
 
