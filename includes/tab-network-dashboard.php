@@ -164,6 +164,15 @@ class DT_Multisite_Tab_Network_Dashboard
         }
 
         foreach ( $sites as $site ) {
+            if ( 'Disciple Tools' !== get_blog_option( $site, 'current_theme' ) ){
+                continue;
+            }
+
+            if ( is_plugin_active_for_network(  'disciple-tools-network-dashboard/disciple-tools-network-dashboard.php' ) ){
+                $active_sites[] = get_blog_details( $site );
+                continue;
+            }
+
             $active_plugins = get_blog_option( $site, 'active_plugins' );
 
             if ( empty( $active_plugins ) ) {
@@ -175,6 +184,7 @@ class DT_Multisite_Tab_Network_Dashboard
                 }
             }
         }
+
         return $active_sites;
 
     }
