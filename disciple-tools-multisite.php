@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/DiscipleTools/disciple-tools-starter-plugin
  * Description: Disciple Tools - Multisite is intended to help developers and integrator jumpstart their extension
  * of the Disciple Tools system.
- * Version:  1.0
+ * Version:  1.1
  * Author URI: https://github.com/DiscipleTools
  * GitHub Plugin URI: https://github.com/DiscipleTools/disciple-tools-starter-plugin
  * Requires at least: 4.7.0
@@ -31,7 +31,9 @@ if ( version_compare( $wp_version, '5.1', '<' ) ) {
     add_action( 'wpmu_new_blog', 'dt_new_blog_force_dt_theme', 10, 1 );
 }
 else {
-    add_action( 'wp_initialize_site', 'dt_new_blog_force_dt_theme', 10, 1 );
+    add_action( 'wp_initialize_site', function ( WP_Site $new_site ){
+        dt_new_blog_force_dt_theme( $new_site->id );
+    }, 10, 1 );
 }
 function dt_new_blog_force_dt_theme( $blog_id ){
     update_blog_option( $blog_id, 'template', 'disciple-tools-theme' );
