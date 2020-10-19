@@ -28,20 +28,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'WP_DEFAULT_THEME', 'disciple-tools-theme' );
 global $wp_version;
 if ( version_compare( $wp_version, '5.1', '<' ) ) {
-    add_action( 'wpmu_new_blog', 'dt_new_blog_force_dt_theme', 10, 6 );
+    add_action( 'wpmu_new_blog', 'dt_new_blog_force_dt_theme', 10, 1 );
 }
 else {
-    add_action( 'wp_initialize_site', 'dt_new_blog_force_dt_theme', 10, 6 );
+    add_action( 'wp_initialize_site', 'dt_new_blog_force_dt_theme', 10, 1 );
 }
-function dt_new_blog_force_dt_theme( $blog_id, $user_id, $domain, $path, $site_id, $meta ){
+function dt_new_blog_force_dt_theme( $blog_id ){
     update_blog_option( $blog_id, 'template', 'disciple-tools-theme' );
     update_blog_option( $blog_id, 'stylesheet', 'disciple-tools-theme' );
     update_blog_option( $blog_id, 'current_theme', 'Disciple Tools' );
 
     // make sure blog administrators can add users or the add new users feature will not be available.
     $add_users_enabled = get_site_option( 'add_new_users' );
-    if ( ! $add_users_enabled ) {
-        update_site_option('add_new_users', 1 );
+    if ( !$add_users_enabled ) {
+        update_site_option( 'add_new_users', 1 );
     }
 }
 /** End */
