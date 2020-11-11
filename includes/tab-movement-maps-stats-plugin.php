@@ -66,7 +66,6 @@ class DT_Movement_Maps_Tab_Network_Dashboard
     }
 
     public function sites_with_movement_maps() {
-        dt_write_log($_POST);
         global $wpdb;
         $dash_tab = new DT_Multisite_Tab_Network_Dashboard();
         $active_dashboard_sites = $dash_tab->get_dashboard_activated_sites();
@@ -76,7 +75,7 @@ class DT_Movement_Maps_Tab_Network_Dashboard
         if ( isset( $_POST['movement_map_approved_nonce'] )
             && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['movement_map_approved_nonce'] ) ), 'movement_map_approved_' . get_current_user_id() ) ) {
 
-            if ( isset( $_POST['enable-all'] ) && ! empty( $_POST['enable-all'] ) ) {
+            if ( isset( $_POST['enable-all'] ) && ! empty( $_POST['enable-all'] ) && isset( $_POST['db_table'] ) && ! empty( $_POST['db_table'] )) {
                 $site_id = sanitize_key( wp_unslash( $_POST['enable-all'] ) );
 
                 $data_table = sanitize_text_field( wp_unslash( $_POST['db_table'] ) );
@@ -104,7 +103,7 @@ class DT_Movement_Maps_Tab_Network_Dashboard
             echo 'No sites found to have activated movement maps plugin';
             return;
         }
-        dt_write_log($active_sites);
+        dt_write_log( $active_sites );
         // get enabled sites
         if ( empty( $active_dashboard_sites ) ) {
             echo 'No sites found to have network dashboard plugin';
@@ -139,7 +138,7 @@ class DT_Movement_Maps_Tab_Network_Dashboard
                             <td><?php echo esc_html( $value->blogname ) ?></td>
                             <td><select name="db_table">
                                 <?php
-                                foreach( $active_dashboard_sites as $dashboard_site ) {
+                                foreach ( $active_dashboard_sites as $dashboard_site ) {
                                     $table = $wpdb->base_prefix . $dashboard_site->blog_id .'_dt_movement_log';
                                     echo '<option value="'. esc_attr( $table ) .'" ';
                                     if ( isset( $enabled_sites[$value->blog_id]['table'] ) && $enabled_sites[$value->blog_id]['table'] === $table ) {
@@ -152,14 +151,14 @@ class DT_Movement_Maps_Tab_Network_Dashboard
                             <td style="width:75px;text-align:center;">
                                 <button type="submit" class="button" style="background-color:red;border-color:red;color:white;" name="disable-all" value="<?php echo esc_html( $value->blog_id ) ?>">Disable</button>
                             </td>
-                        <?php
+                            <?php
                         } else {
                             ?>
                             <td style="width:30px;"><span style="font-size:1.5em;">&#10007;</span></td>
                             <td><?php echo esc_html( $value->blogname ) ?></td>
                             <td><select name="db_table">
                                     <?php
-                                    foreach( $active_dashboard_sites as $dashboard_site ) {
+                                    foreach ( $active_dashboard_sites as $dashboard_site ) {
                                         $table = $wpdb->base_prefix . $dashboard_site->blog_id .'_dt_movement_log';
                                         echo '<option value="'. esc_attr( $table ) .'" ';
                                         if ( isset( $enabled_sites[$value->blog_id]['table'] ) && $enabled_sites[$value->blog_id]['table'] === $table ) {

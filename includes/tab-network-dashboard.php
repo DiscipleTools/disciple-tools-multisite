@@ -168,7 +168,7 @@ class DT_Multisite_Tab_Network_Dashboard
                 continue;
             }
 
-            if ( is_plugin_active_for_network(  'disciple-tools-network-dashboard/disciple-tools-network-dashboard.php' ) ){
+            if ( is_plugin_active_for_network( 'disciple-tools-network-dashboard/disciple-tools-network-dashboard.php' ) ){
                 $active_sites[] = get_blog_details( $site );
                 continue;
             }
