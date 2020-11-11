@@ -147,8 +147,6 @@ class DT_Multisite_Tab_Overview
                                     datatype: 'json',
                                     url: 'https://'+v+'/wp-json/'
                                 });
-                                // jQuery.get('https://'+v+'/wp-cron.php')
-                                // jQuery.get('https://disciple.tools')
                                 list.append( v + '<br>')
                                 console.log(v)
                             }, 300 * i )
