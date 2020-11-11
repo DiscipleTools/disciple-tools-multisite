@@ -60,22 +60,25 @@ class DT_Multisite_Tab_Overview
     }
 
     public function network_upgrade(){
+        $domains = false;
         if ( isset( $_POST['network_upgrade_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['network_upgrade_nonce'] ) ), 'network_upgrade' ) ) {
             if ( isset( $_POST['url_trigger'] ) ) {
-                dt_write_log( 'url_trigger' );
-
                 global $wpdb;
-
-                $sites = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->base_prefix}blogs;" );
-                if ( ! empty( $sites ) ) {
-                    foreach ( $sites as $site ) {
-                        if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
-                            $url = get_blog_option( $site, 'siteurl' );
-                            $response = wp_remote_head( $url );
-                            dt_write_log( $response );
-                        }
-                    }
-                }
+                $domains = $wpdb->get_col( "SELECT domain FROM {$wpdb->base_prefix}blogs;" );
+//                dt_write_log( 'url_trigger' );
+//
+//                global $wpdb;
+//
+//                $sites = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->base_prefix}blogs;" );
+//                if ( ! empty( $sites ) ) {
+//                    foreach ( $sites as $site ) {
+//                        if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
+//                            $url = get_blog_option( $site, 'siteurl' );
+//                            $response = wp_remote_head( $url );
+//                            dt_write_log( $response );
+//                        }
+//                    }
+//                }
             }
 
             if ( isset( $_POST['programmatic_trigger'] ) ) {
@@ -120,17 +123,41 @@ class DT_Multisite_Tab_Overview
                 </td>
             </tr>
             <tr>
-                <td>
+                <td id="list">
                     <form method="post">
                         <?php wp_nonce_field( 'network_upgrade', 'network_upgrade_nonce', false, true ) ?>
                         <button type="submit" class="button" name="url_trigger" value="1">Trigger Sites through URL Call</button>
-                        <button type="submit" class="button" name="programmatic_trigger" value="1">Trigger Sites Programmatically</button>
                     </form>
-
                 </td>
             </tr>
             </tbody>
         </table>
+        <?php if ( $domains ) : ?>
+            <script>
+                jQuery(document).ready(function(){
+                    let domains = [<?php echo json_encode( $domains ) ?>][0]
+                    console.log(domains)
+                    if ( typeof domains !== 'undefined' ){
+                        let list = jQuery('#list')
+                        jQuery.each(domains, function(i,v){
+                            setTimeout(function(){
+
+                                jQuery.ajax({
+                                    type: 'GET',
+                                    datatype: 'json',
+                                    url: 'https://'+v+'/wp-json/'
+                                });
+                                // jQuery.get('https://'+v+'/wp-cron.php')
+                                // jQuery.get('https://disciple.tools')
+                                list.append( v + '<br>')
+                                console.log(v)
+                            }, 300 * i )
+                        })
+                    }
+                })
+
+            </script>
+        <?php endif; ?>
         <br>
         <!-- End Box -->
         <?php
