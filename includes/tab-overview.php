@@ -65,43 +65,6 @@ class DT_Multisite_Tab_Overview
             if ( isset( $_POST['url_trigger'] ) ) {
                 global $wpdb;
                 $domains = $wpdb->get_col( "SELECT domain FROM {$wpdb->base_prefix}blogs;" );
-//                dt_write_log( 'url_trigger' );
-//
-//                global $wpdb;
-//
-//                $sites = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->base_prefix}blogs;" );
-//                if ( ! empty( $sites ) ) {
-//                    foreach ( $sites as $site ) {
-//                        if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
-//                            $url = get_blog_option( $site, 'siteurl' );
-//                            $response = wp_remote_head( $url );
-//                            dt_write_log( $response );
-//                        }
-//                    }
-//                }
-            }
-
-            if ( isset( $_POST['programmatic_trigger'] ) ) {
-                dt_write_log( 'programmatic_trigger' );
-
-                global $wpdb;
-                $sites = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->base_prefix}blogs" );
-                if ( ! empty( $sites ) ) {
-                    foreach ( $sites as $site ) {
-                        dt_write_log( $site );
-                        if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
-                            switch_to_blog( $site );
-
-
-                            require( ABSPATH . '/wp-load.php' ); // loads the wp framework when called
-                            require_once( get_template_directory() . '/functions.php' );
-                            disciple_tools();
-
-                            restore_current_blog();
-                        }
-                    }
-                }
-            }
         }
 
         ?>
@@ -152,9 +115,7 @@ class DT_Multisite_Tab_Overview
                             }, 300 * i )
                         })
                     }
-                })
-
-            </script>
+                })</script>
         <?php endif; ?>
         <br>
         <!-- End Box -->
