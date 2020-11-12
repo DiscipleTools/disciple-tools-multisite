@@ -67,7 +67,6 @@ class DT_Multisite_Tab_Overview
                 $domains = $wpdb->get_col("SELECT domain FROM {$wpdb->base_prefix}blogs;");
             }
         }
-
         ?>
         <!-- Box -->
         <table class="widefat striped">
@@ -105,7 +104,6 @@ class DT_Multisite_Tab_Overview
                         let list = jQuery('#list')
                         jQuery.each(domains, function(i,v){
                             setTimeout(function(){
-
                                 jQuery.ajax({
                                     type: 'GET',
                                     datatype: 'json',
