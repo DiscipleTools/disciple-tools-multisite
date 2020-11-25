@@ -1,6 +1,6 @@
 {
   "name": "Disciple Tools - Multisite",
-  
+
   "version": "1.2",
   "download_url": "https://github.com/DiscipleTools/disciple-tools-multisite/releases/latest/download/disciple-tools-multisite.zip",
   "sections": {
@@ -11,18 +11,16 @@
   "last_updated": "2020-11-24",
   "upgrade_notice": "Here's why you should upgrade...",
 
-	
-	
    "requires": "4.7",
    "tested": "5.5",
   "banners": {
     "low": "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/images/dt-placeholder-772x250.jpg",
     "high": "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/images/dt-placeholder-1544x500.jpg"
   },
-	
+
   "author": "Disciple Tools",
   "author_homepage": "https://disciple.tools",
-	
+
   "homepage": "https://github.com/DiscipleTools/disciple-tools-multisite",
   "issues_url": "https://github.com/DiscipleTools/disciple-tools-multisite/issues",
   "projects_url": "https://github.com/DiscipleTools/disciple-tools-multisite/projects",
