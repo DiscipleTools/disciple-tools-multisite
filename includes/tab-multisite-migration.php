@@ -669,7 +669,7 @@ class DT_Multisite_Tab_Import_Subsite {
                 <?php else : ?>
                     <p>
                         <label>
-                            New SubSite Name<br>
+                            New SubSite Name. Note this must be a <strong>new</strong> site. You cannot use an existing name or subdomain.<br>
                             <input type="text" name="new_site" placeholder="site1">
                         </label>
                     </p>
