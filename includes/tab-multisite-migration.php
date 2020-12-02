@@ -670,6 +670,7 @@ class DT_Multisite_Tab_Import_Subsite {
                     <p>
                         <label>
                             New SubSite Name. Note this must be a <strong>new</strong> site. You cannot use an existing name or subdomain.<br>
+                            Also. Please disable any caching plugin (cache, redis, etc). They keep users from being created in some cases.
                             <input type="text" name="new_site" placeholder="site1">
                         </label>
                     </p>
