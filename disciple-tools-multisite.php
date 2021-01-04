@@ -26,11 +26,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**********************************************************************************************************************
  * MAKE DISCIPLE TOOLS DEFAULT THEME
  */
-if ( file_exists( ABSPATH . 'wp-content/themes/disciple-tools-theme/functions.php' )) {
-    define( 'WP_DEFAULT_THEME', 'disciple-tools-theme' );
-} elseif (file_exists( ABSPATH . 'wp-content/themes/disciple-tools-theme-master/functions.php' ) ){
-    define( 'WP_DEFAULT_THEME', 'disciple-tools-theme-master' );
+if ( ! defined( 'WP_DEFAULT_THEME' ) ) {
+    if ( file_exists( ABSPATH . 'wp-content/themes/disciple-tools-theme/functions.php' )) {
+        define( 'WP_DEFAULT_THEME', 'disciple-tools-theme' );
+    } elseif (file_exists( ABSPATH . 'wp-content/themes/disciple-tools-theme-master/functions.php' ) ){
+        define( 'WP_DEFAULT_THEME', 'disciple-tools-theme-master' );
+    }
 }
+
 global $wp_version;
 if ( version_compare( $wp_version, '5.1', '<' ) ) {
     add_action( 'wpmu_new_blog', 'dt_new_blog_force_dt_theme', 10, 1 );
