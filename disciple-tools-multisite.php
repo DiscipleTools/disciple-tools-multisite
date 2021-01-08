@@ -3,7 +3,7 @@
  * Plugin Name: Disciple Tools - Multisite
  * Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Description: Disciple Tools Multisite plugin adds network administration utilities to the multisite network admin area, helpful for managing Disciple Tools multisite installs.
- * Version:  1.2
+ * Version:  1.3
  * Author URI: https://github.com/DiscipleTools
  * GitHub Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Requires at least: 4.7.0
@@ -16,6 +16,7 @@
  *          https://www.gnu.org/licenses/gpl-2.0.html
  *
  * @version 1.2 Added support for the Network Dashboard and the Network Dashboard Remote plugins.
+ * @version 1.3 Disciple Tools 1.0 support
  */
 
 
@@ -159,7 +160,7 @@ class DT_Multisite {
 
         // Admin and settings variables
         $this->token             = 'dt_multisite';
-        $this->version             = '1.2';
+        $this->version             = '1.3';
 
     }
 
