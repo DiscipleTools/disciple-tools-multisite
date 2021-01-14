@@ -2,7 +2,7 @@
 
 # Disciple Tools Multisite
 This plugin is highly recommended for administrators running a multisite wordpress / Disciple Tools installation. It adds
-helpful Disciple Tools specific administrative tools.
+special administrative tools for multisite Disciple Tools systems. These tools help the Super Admin of a multisite server maintain and protect a system with many Disciple Tools systems. They also extend multi-site capacity to key plugins like the Network Dashboard.
 
 # Video Walk-through
 
