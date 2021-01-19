@@ -1,6 +1,10 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly
+}
+
 /**
- *
+ * Class DT_Multisite_Tab_Import_Subsite
  */
 class DT_Multisite_Tab_Import_Subsite {
     public function content() {

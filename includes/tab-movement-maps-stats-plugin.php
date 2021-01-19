@@ -1,7 +1,10 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly
+}
 
 /**
- *
+ * Class DT_Movement_Maps_Tab_Network_Dashboard
  */
 class DT_Movement_Maps_Tab_Network_Dashboard
 {

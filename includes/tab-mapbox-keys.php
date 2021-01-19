@@ -1,7 +1,10 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly
+}
 
 /**
- * Class DT_Starter_Tab_Second
+ * Class DT_Multisite_Tab_Mapbox_Keys
  */
 class DT_Multisite_Tab_Mapbox_Keys
 {
@@ -21,6 +24,10 @@ class DT_Multisite_Tab_Mapbox_Keys
                     <div id="postbox-container-1" class="postbox-container">
                         <!-- Right Column -->
 
+                        <?php $this->bulk_key_add() ?>
+
+                        <?php $this->default_key() ?>
+
                         <!-- End Right Column -->
                     </div><!-- postbox-container 1 -->
                     <div id="postbox-container-2" class="postbox-container">
@@ -32,6 +39,7 @@ class DT_Multisite_Tab_Mapbox_Keys
     }
 
     public function process_post() {
+        // update
         if ( isset( $_POST['mapbox_nonce'] )
             && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mapbox_nonce'] ) ), 'mapbox' ) ) {
 
@@ -43,6 +51,38 @@ class DT_Multisite_Tab_Mapbox_Keys
                 } else {
                     update_blog_option( $site_id, 'dt_mapbox_api_key', sanitize_text_field( wp_unslash( $_POST['mapbox_key'] ) ) );
                 }
+            }
+        }
+        // bulk
+        if ( isset( $_POST['bulk_mapbox_nonce'] )
+            && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['bulk_mapbox_nonce'] ) ), 'bulk_mapbox' )
+            && isset( $_POST['add_key'] ) && ! empty( $_POST['add_key'] )
+        ) {
+            $key = sanitize_text_field( wp_unslash( $_POST['add_key'] ) );
+
+            global $wpdb;
+            $sites = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->base_prefix}blogs;" );
+            if ( ! empty( $sites ) ) {
+                foreach ( $sites as $site ) {
+                    if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
+                        $current_key = get_blog_option( $site, 'dt_mapbox_api_key' );
+                        if ( empty( $current_key ) ) {
+                            update_blog_option( $site, 'dt_mapbox_api_key', $key );
+                        }
+                    }
+                }
+            }
+        }
+        // default
+        if ( isset( $_POST['default_mapbox_nonce'] )
+            && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['default_mapbox_nonce'] ) ), 'default_mapbox' )
+            && isset( $_POST['default_key'] )
+        ) {
+            $key = sanitize_text_field( wp_unslash( $_POST['default_key'] ) );
+            if ( empty( $_POST['default_key'] ) ) {
+                update_network_option( 1, 'dt_mapbox_api_key', '' );
+            } else {
+                update_network_option( 1, 'dt_mapbox_api_key', $key );
             }
         }
     }
@@ -93,7 +133,7 @@ class DT_Multisite_Tab_Mapbox_Keys
                     </tr>
                 </form>
             <?php endforeach;
-endif; ?>
+            endif; ?>
             </tbody>
         </table>
         <br>
@@ -101,5 +141,64 @@ endif; ?>
         <?php
     }
 
+    public function bulk_key_add(){
+        ?>
+        <!-- Box -->
+        <form method="post">
+            <?php wp_nonce_field( 'bulk_mapbox', 'bulk_mapbox_nonce' ) ?>
+            <table class="widefat striped">
+                <thead>
+                <tr>
+                    <th>Add Mapbox Key to All Empty Sites</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input type="text" name="add_key" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button class="button btn" type="submit">Add Key to All Empty Fields</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+        <br>
+        <!-- End Box -->
+        <?php
+    }
 
+    public function default_key(){
+        $key = get_network_option( 1, 'dt_mapbox_api_key' );
+        ?>
+        <!-- Box -->
+        <form method="post">
+            <?php wp_nonce_field( 'default_mapbox', 'default_mapbox_nonce' ) ?>
+            <table class="widefat striped">
+                <thead>
+                <tr>
+                    <th>Set Default Mapbox Key</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <input type="text" name="default_key" value="<?php echo esc_attr( $key ) ?>" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button class="button btn" type="submit">Set Default Key</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+        <br>
+        <!-- End Box -->
+        <?php
+    }
 }

@@ -3,7 +3,7 @@
  * Plugin Name: Disciple Tools - Multisite
  * Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Description: Disciple Tools Multisite plugin adds network administration utilities to the multisite network admin area, helpful for managing Disciple Tools multisite installs.
- * Version:  1.3
+ * Version:  1.4
  * Author URI: https://github.com/DiscipleTools
  * GitHub Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Requires at least: 4.7.0
@@ -17,6 +17,7 @@
  *
  * @version 1.2 Added support for the Network Dashboard and the Network Dashboard Remote plugins.
  * @version 1.3 Disciple Tools 1.0 support
+ * @version 1.4 Changed version control. Added mapbox key bulk utility.
  */
 
 
@@ -49,6 +50,11 @@ function dt_new_blog_force_dt_theme( $blog_id ){
     update_blog_option( $blog_id, 'stylesheet', 'disciple-tools-theme' );
     update_blog_option( $blog_id, 'current_theme', 'Disciple Tools' );
 
+    if ( get_network_option( 1, 'dt_mapbox_api_key' ) ) {
+        $key = get_network_option( 1, 'dt_mapbox_api_key' );
+        update_blog_option( $blog_id, 'dt_mapbox_api_key', $key );
+    }
+
     // make sure blog administrators can add users or the add new users feature will not be available.
     $add_users_enabled = get_site_option( 'add_new_users' );
     if ( !$add_users_enabled ) {
@@ -66,52 +72,20 @@ function dt_new_blog_force_dt_theme( $blog_id ){
  */
 function dt_multisite() {
     if ( is_multisite() && is_network_admin() ) {
-        return DT_Multisite::get_instance();
+        return DT_Multisite::instance();
     }
     return false;
 }
 add_action( 'init', 'dt_multisite' );
 
-/**
- * Singleton class for setting up the plugin.
- *
- * @since  0.1
- * @access public
- */
 class DT_Multisite {
 
-    /**
-     * Declares public variables
-     *
-     * @since  0.1
-     * @access public
-     * @return object
-     */
-    public $token;
-    public $version;
-    public $dir_path = '';
-    public $dir_uri = '';
-    public $img_uri = '';
-    public $includes_path;
-
-    /**
-     * Returns the instance.
-     *
-     * @since  0.1
-     * @access public
-     * @return object
-     */
-    public static function get_instance() {
-
-        static $instance = null;
-
-        if ( is_null( $instance ) ) {
-            $instance = new dt_multisite();
-            $instance->setup();
-            $instance->includes();
-            $instance->setup_actions();
+    private static $_instance = null;
+    public static function instance() {
+        if ( is_null( self::$_instance ) ) {
+            self::$_instance = new self();
         }
-        return $instance;
+        return self::$_instance;
     }
 
     /**
@@ -122,16 +96,6 @@ class DT_Multisite {
      * @return void
      */
     private function __construct() {
-    }
-
-    /**
-     * Loads files needed by the plugin.
-     *
-     * @since  0.1
-     * @access public
-     * @return void
-     */
-    private function includes() {
         if ( is_multisite() && is_network_admin() ) {
             require_once( 'includes/tab-overview.php' );
             require_once( 'includes/tab-network-dashboard.php' );
@@ -140,38 +104,6 @@ class DT_Multisite {
             require_once( 'includes/tab-movement-maps-stats-plugin.php' );
             require_once( 'includes/admin-page.php' );
         }
-    }
-
-    /**
-     * Sets up globals.
-     *
-     * @since  0.1
-     * @access public
-     * @return void
-     */
-    private function setup() {
-
-        // Main plugin directory path and URI.
-        $this->dir_path     = trailingslashit( plugin_dir_path( __FILE__ ) );
-        $this->dir_uri      = trailingslashit( plugin_dir_url( __FILE__ ) );
-
-        // Plugin directory paths.
-        $this->includes_path      = trailingslashit( $this->dir_path . 'includes' );
-
-        // Admin and settings variables
-        $this->token             = 'dt_multisite';
-        $this->version             = '1.3';
-
-    }
-
-    /**
-     * Sets up main plugin actions and filters.
-     *
-     * @since  0.1
-     * @access public
-     * @return void
-     */
-    private function setup_actions() {
 
         if ( is_multisite() && is_network_admin() ) {
 
@@ -179,23 +111,14 @@ class DT_Multisite {
             if ( ! class_exists( 'Puc_v4_Factory' ) ) {
                 require_once( 'includes/admin/plugin-update-checker/plugin-update-checker.php' );
             }
-            /**
-             * Below is the publicly hosted .json file that carries the version information. This file can be hosted
-             * anywhere as long as it is publicly accessible. You can download the version file listed below and use it as
-             * a template.
-             * Also, see the instructions for version updating to understand the steps involved.
-             * @see https://github.com/DiscipleTools/disciple-tools-version-control/wiki/How-to-Update-the-Starter-Plugin
-             */
-            $hosted_json = "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/disciple-tools-multisite-version-control.json";
+
+            $hosted_json = "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-multisite/master/version-control.json";
             Puc_v4_Factory::buildUpdateChecker(
                 $hosted_json,
                 __FILE__,
                 'disciple-tools-multisite'
             );
         }
-
-        // Internationalize the text strings used.
-        add_action( 'init', array( $this, 'i18n' ), 2 );
 
         if ( is_admin() || is_network_admin() ) {
             // adds links to the plugin description area in the plugin admin list.
@@ -222,7 +145,6 @@ class DT_Multisite {
             $links_array[] = '<a href="https://github.com/DiscipleTools/disciple-tools-multisite">Github Project</a>';
             $links_array[] = '<a href="https://disciple.tools">Disciple.Tools Community</a>';
 
-            // add other links here
         }
 
         return $links_array;
@@ -236,14 +158,6 @@ class DT_Multisite {
      * @return void
      */
     public static function activation() {
-
-        // Confirm 'Administrator' has 'manage_dt' privilege. This is key in 'remote' configuration when
-        // Disciple Tools theme is not installed, otherwise this will already have been installed by the Disciple Tools Theme
-        $role = get_role( 'administrator' );
-        if ( !empty( $role ) ) {
-            $role->add_cap( 'manage_dt' ); // gives access to dt plugin options
-        }
-
     }
 
     /**
@@ -255,17 +169,6 @@ class DT_Multisite {
      */
     public static function deactivation() {
         delete_option( 'dismissed-dt-multisite' );
-    }
-
-    /**
-     * Loads the translation files.
-     *
-     * @since  0.1
-     * @access public
-     * @return void
-     */
-    public function i18n() {
-        load_plugin_textdomain( 'dt_multisite', false, trailingslashit( dirname( plugin_basename( __FILE__ ) ) ). 'languages' );
     }
 
     /**
@@ -321,24 +224,3 @@ class DT_Multisite {
 // Register activation hook.
 register_activation_hook( __FILE__, [ 'DT_Multisite', 'activation' ] );
 register_deactivation_hook( __FILE__, [ 'DT_Multisite', 'deactivation' ] );
-
-if ( ! function_exists( 'dt_write_log' ) ) {
-    // @note Included here because the module can be used independently
-    function dt_write_log( $log ) {
-        if ( true === WP_DEBUG ) {
-            global $dt_write_log_microtime;
-            $now = microtime( true );
-            if ( $dt_write_log_microtime > 0 ) {
-                $elapsed_log = sprintf( "[elapsed:%5dms]", ( $now - $dt_write_log_microtime ) * 1000 );
-            } else {
-                $elapsed_log = "[elapsed:-------]";
-            }
-            $dt_write_log_microtime = $now;
-            if ( is_array( $log ) || is_object( $log ) ) {
-                error_log( $elapsed_log . " " . print_r( $log, true ) );
-            } else {
-                error_log( "$elapsed_log $log" );
-            }
-        }
-    }
-}
