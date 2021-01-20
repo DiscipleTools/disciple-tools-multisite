@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/DiscipleTools/disciple-tools-multisite.svg?branch=master)](https://travis-ci.com/DiscipleTools/disciple-tools-multisite)
 
-# Disciple Tools - Multisite
+# Disciple.Tools - Multisite
 
 Add specialized administration tools for Super Admins managing a Disciple.Tools multisite server. We highly recommend this plugin
 for super administrators running a multisite server.
@@ -8,7 +8,7 @@ for super administrators running a multisite server.
 ## Purpose
 
 Running a multisite Disciple.Tools system has great advantages for organizations or multi-team efforts. It allows central
-management of updates for plugins and theme, cost economy of easily running hundreds Disciple Tools systems on one server
+management of updates for plugins and theme, cost economy of easily running hundreds Disciple.Tools systems on one server
 with one database, and sharing single sign-on user accounts between sites on the same server.
 
 These hosting and management advantages come with a couple stresses for the Super Admin that this plugin addresses and
@@ -17,9 +17,9 @@ provides tools to overcome.
 ## Usage
 #### Will Do
 
-- Adds "Disciple Tools" menu item to Network Admin area.
+- Adds "Disciple.Tools" menu item to Network Admin area.
 - Adds bulk update trigger
-- Adds mport Subsite tool
+- Adds import Subsite tool
 - Adds Mapbox Key manager
 - Adds Network Dashboard authorization manager
 - Adds Movement Maps authorization manager
@@ -30,7 +30,7 @@ provides tools to overcome.
 
 ## Requirements
 
-- Multisite Disciple Tools server
+- Multisite Disciple.Tools server
 - Super Admin access to the Network Admin Area
 
 ## Installing
