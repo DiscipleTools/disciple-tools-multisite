@@ -105,7 +105,7 @@ function dt_multisite_network_admin_content(){
  * @param $blog_id
  * @param $drop
  */
-add_action( 'wp_delete_site', 'dt_delete_all_subsite_tables', 10, 2 );
+add_action( 'wp_delete_site', 'dt_delete_all_subsite_tables', 10, 1 );
 function dt_delete_all_subsite_tables( $old_site ) {
 
     /**
