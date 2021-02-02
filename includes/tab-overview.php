@@ -67,7 +67,7 @@ class DT_Multisite_Tab_Overview
         if ( isset( $_POST['network_upgrade_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['network_upgrade_nonce'] ) ), 'network_upgrade' ) ) {
             if ( isset( $_POST['url_trigger'] ) ) {
                 global $wpdb;
-                $domains = $wpdb->get_col( "SELECT domain FROM {$wpdb->base_prefix}blogs;" );
+                $domains = $wpdb->get_col( "SELECT CONCAT(domain, path) as domain FROM {$wpdb->base_prefix}blogs;" );
             }
         }
         ?>
@@ -110,7 +110,7 @@ class DT_Multisite_Tab_Overview
                                 jQuery.ajax({
                                     type: 'GET',
                                     datatype: 'json',
-                                    url: 'https://'+v+'/wp-json/'
+                                    url: 'https://'+v+'wp-json/'
                                 });
                                 list.append( v + '<br>')
                                 console.log(v)
