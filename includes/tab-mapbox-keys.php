@@ -237,6 +237,7 @@ class DT_Multisite_Tab_Mapbox_Keys
                 <?php
                 $continue = false;
                 $site_to_update = null;
+                $sites_to_upgrade = 0;
                 global $wpdb;
                 if ( isset( $_GET['upgrade_database_nonce'] )
                     && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['upgrade_database_nonce'] ) ), 'upgrade_database' )
@@ -255,8 +256,10 @@ class DT_Multisite_Tab_Mapbox_Keys
                                 $dt_setup_options = get_blog_option( $site, "dt_setup_options", [] );
                                 $api_key = get_blog_option( $site, 'dt_mapbox_api_key' );
                                 if ( $api_key && !isset( $dt_setup_options["mapbox_upgrade"] ) ){
-                                    $site_to_update = $site;
-                                    break;
+                                    if ( !$site_to_update ){
+                                        $site_to_update = $site;
+                                    }
+                                    $sites_to_upgrade++;
                                 }
                             }
                         }
@@ -293,6 +296,7 @@ class DT_Multisite_Tab_Mapbox_Keys
                     <?php if ( !empty( $count ) || !empty( $user_count ) ) : ?>
                     <tr>
                         <td>
+                            <strong>Remaining sites: <?php echo esc_html( $sites_to_upgrade ); ?></strong><br>
                             <strong><?php echo esc_html( get_site_url() ); ?></strong><br>
                             <strong>Processing ( <?php echo esc_attr( $count + $user_count ) ?> ) </strong><br>
                             <span><img src="<?php echo esc_url( trailingslashit( get_stylesheet_directory_uri() ) ) ?>spinner.svg" width="22px" alt="spinner "/></span><br>
@@ -314,6 +318,7 @@ class DT_Multisite_Tab_Mapbox_Keys
                     <?php else : ?>
                         <tr>
                             <td>
+                                <strong>Remaining sites: <?php echo esc_html( $sites_to_upgrade ); ?></strong><br>
                                 <strong>Loading next site</strong><br>
                                 <span><img src="<?php echo esc_url( trailingslashit( get_stylesheet_directory_uri() ) ) ?>spinner.svg" width="22px" alt="spinner "/></span><br>
                             </td>
