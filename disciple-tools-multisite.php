@@ -3,7 +3,7 @@
  * Plugin Name: Disciple Tools - Multisite
  * Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Description: Disciple Tools Multisite plugin adds network administration utilities to the multisite network admin area, helpful for managing Disciple Tools multisite installs.
- * Version:  1.5
+ * Version:  1.6
  * Author URI: https://github.com/DiscipleTools
  * GitHub Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Requires at least: 4.7.0
@@ -118,6 +118,21 @@ class DT_Multisite {
                 __FILE__,
                 'disciple-tools-multisite'
             );
+
+
+            //check for theme updates when the default theme is not Disciple.Tools
+            $themes = wp_get_themes();
+            foreach ( $themes as $theme ){
+                $text_domain = $theme->get( 'TextDomain' );
+                if ( $text_domain && $text_domain === "disciple_tools" && file_exists( $theme->get_stylesheet_directory() . '/functions.php' )){
+                    Puc_v4_Factory::buildUpdateChecker(
+                        'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/disciple-tools-theme-version-control.json',
+                        $theme->get_stylesheet_directory(),
+                        'disciple-tools-theme'
+                    );
+
+                }
+            }
         }
 
         if ( is_admin() || is_network_admin() ) {
@@ -224,3 +239,12 @@ class DT_Multisite {
 // Register activation hook.
 register_activation_hook( __FILE__, [ 'DT_Multisite', 'activation' ] );
 register_deactivation_hook( __FILE__, [ 'DT_Multisite', 'deactivation' ] );
+
+/**
+ * Make the update checker available on multisites when the default theme is not Disciple.Tools
+ */
+if ( is_multisite() && is_network_admin() ){
+    if ( !class_exists( 'Puc_v4_Factory' ) ){
+        require( "includes/admin/plugin-update-checker/plugin-update-checker.php" );
+    }
+}
