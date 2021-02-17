@@ -105,36 +105,6 @@ class DT_Multisite {
             require_once( 'includes/admin-page.php' );
         }
 
-        if ( is_multisite() && is_network_admin() ) {
-
-            // Check for plugin updates
-            if ( ! class_exists( 'Puc_v4_Factory' ) ) {
-                require_once( 'includes/admin/plugin-update-checker/plugin-update-checker.php' );
-            }
-
-            $hosted_json = "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-multisite/master/version-control.json";
-            Puc_v4_Factory::buildUpdateChecker(
-                $hosted_json,
-                __FILE__,
-                'disciple-tools-multisite'
-            );
-
-
-            //check for theme updates when the default theme is not Disciple.Tools
-            $themes = wp_get_themes();
-            foreach ( $themes as $theme ){
-                $text_domain = $theme->get( 'TextDomain' );
-                if ( $text_domain && $text_domain === "disciple_tools" && file_exists( $theme->get_stylesheet_directory() . '/functions.php' )){
-                    Puc_v4_Factory::buildUpdateChecker(
-                        'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/disciple-tools-theme-version-control.json',
-                        $theme->get_stylesheet_directory(),
-                        'disciple-tools-theme'
-                    );
-
-                }
-            }
-        }
-
         if ( is_admin() || is_network_admin() ) {
             // adds links to the plugin description area in the plugin admin list.
             add_filter( 'plugin_row_meta', [ $this, 'plugin_description_links' ], 10, 4 );
@@ -248,3 +218,27 @@ if ( is_multisite() && is_network_admin() ){
         require( "includes/admin/plugin-update-checker/plugin-update-checker.php" );
     }
 }
+
+add_action( 'plugins_loaded', function (){
+    if ( is_multisite() && ( is_admin() || wp_doing_cron() ) ){
+        // find the Disciple.Tools theme and load the plugin update checker.
+        foreach ( wp_get_themes() as $theme ){
+            if ( $theme->get( 'TextDomain' ) === "disciple_tools" && file_exists( $theme->get_stylesheet_directory() . '/dt-core/libraries/plugin-update-checker/plugin-update-checker.php' ) ){
+                if ( class_exists( 'Puc_v4_Factory' ) ) {
+                    Puc_v4_Factory::buildUpdateChecker(
+                        'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/disciple-tools-theme-version-control.json',
+                        $theme->get_stylesheet_directory(),
+                        basename( $theme->get_stylesheet_directory() )
+                    );
+                }
+            }
+        }
+
+        $hosted_json = "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-multisite/master/version-control.json";
+        Puc_v4_Factory::buildUpdateChecker(
+            $hosted_json,
+            __FILE__,
+            'disciple-tools-multisite'
+        );
+    }
+} );
