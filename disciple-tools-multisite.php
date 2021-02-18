@@ -213,14 +213,14 @@ register_deactivation_hook( __FILE__, [ 'DT_Multisite', 'deactivation' ] );
 /**
  * Make the update checker available on multisites when the default theme is not Disciple.Tools
  */
-if ( is_multisite() && is_network_admin() ){
+if ( is_multisite() && is_network_admin() || wp_doing_cron()){
     if ( !class_exists( 'Puc_v4_Factory' ) ){
         require( "includes/admin/plugin-update-checker/plugin-update-checker.php" );
     }
 }
 
 add_action( 'plugins_loaded', function (){
-    if ( is_multisite() && ( is_admin() || wp_doing_cron() ) ){
+    if ( is_multisite() && ( is_network_admin() || wp_doing_cron() ) ){
         // find the Disciple.Tools theme and load the plugin update checker.
         foreach ( wp_get_themes() as $theme ){
             if ( $theme->get( 'TextDomain' ) === "disciple_tools" && file_exists( $theme->get_stylesheet_directory() . '/dt-core/libraries/plugin-update-checker/plugin-update-checker.php' ) ){
@@ -233,12 +233,22 @@ add_action( 'plugins_loaded', function (){
                 }
             }
         }
-
-        $hosted_json = "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-multisite/master/version-control.json";
-        Puc_v4_Factory::buildUpdateChecker(
-            $hosted_json,
-            __FILE__,
-            'disciple-tools-multisite'
-        );
+        if ( !function_exists( 'get_plugins' ) ) {
+            include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+        }
+        $plugins = get_plugins();
+        foreach ( $plugins as $plugin_path => $plugin ){
+            if ( isset( $plugin["TextDomain"] ) && strpos( $plugin["TextDomain"], "disciple-tools" ) !== false ){
+                $a = ABSPATH . 'wp-content/plugins/' . $plugin["TextDomain"];
+                if ( file_exists( $a . '/version-control.json' ) ){
+                    $hosted_json = "https://raw.githubusercontent.com/DiscipleTools/". $plugin["TextDomain"]. "/master/version-control.json";
+                    Puc_v4_Factory::buildUpdateChecker(
+                        $hosted_json,
+                        ABSPATH . 'wp-content/plugins/' . $plugin_path,
+                        "multi" . $plugin["TextDomain"]
+                    );
+                }
+            }
+        }
     }
 } );
