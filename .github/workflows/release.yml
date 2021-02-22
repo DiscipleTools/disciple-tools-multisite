@@ -23,7 +23,7 @@ jobs:
     - name: Build project
       run: |
         mkdir disciple-tools-multisite-master |
-        cp -r disciple-tools-multisite.php LICENSE SECURITY.md includes languages spinner.svg disciple-tools-multisite-master/ |
+        cp -r disciple-tools-multisite.php LICENSE SECURITY.md includes languages spinner.svg version-control.json disciple-tools-multisite-master/ |
         zip -r disciple-tools-multisite.zip disciple-tools-multisite-master
     - name: Create Release
       id: create_release

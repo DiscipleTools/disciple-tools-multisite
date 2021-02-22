@@ -233,12 +233,22 @@ add_action( 'plugins_loaded', function (){
                 }
             }
         }
-
-        $hosted_json = "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-multisite/master/version-control.json";
-        Puc_v4_Factory::buildUpdateChecker(
-            $hosted_json,
-            __FILE__,
-            'disciple-tools-multisite'
-        );
+        if ( !function_exists( 'get_plugins' ) ) {
+            include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+        }
+        $plugins = get_plugins();
+        foreach ( $plugins as $plugin_path => $plugin ){
+            if ( isset( $plugin["TextDomain"] ) && strpos( $plugin["TextDomain"], "disciple-tools" ) !== false ){
+                $plugin_folder = ABSPATH . 'wp-content/plugins/' . $plugin["TextDomain"];
+                if ( file_exists( $plugin_folder . '/version-control.json' ) && isset( $plugin["PluginURI"] ) ){
+                    $hosted_json = str_replace( "github.com", "raw.githubusercontent.com", $plugin["PluginURI"] ) . "/master/version-control.json";
+                    Puc_v4_Factory::buildUpdateChecker(
+                        $hosted_json,
+                        ABSPATH . 'wp-content/plugins/' . $plugin_path,
+                        "multi" . $plugin["TextDomain"]
+                    );
+                }
+            }
+        }
     }
 } );
