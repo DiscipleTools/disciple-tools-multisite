@@ -240,7 +240,7 @@ add_action( 'plugins_loaded', function (){
         foreach ( $plugins as $plugin_path => $plugin ){
             if ( isset( $plugin["TextDomain"] ) && strpos( $plugin["TextDomain"], "disciple-tools" ) !== false ){
                 $plugin_folder = ABSPATH . 'wp-content/plugins/' . $plugin["TextDomain"];
-                if ( file_exists( $plugin_folder . '/version-control.json' ) && isset( $plugin["PluginURI"] ) ){
+                if ( file_exists( $plugin_folder . '/version-control.json' ) && isset( $plugin["PluginURI"] ) && !empty( $plugin["PluginURI"] ) ){
                     $hosted_json = str_replace( "github.com", "raw.githubusercontent.com", $plugin["PluginURI"] ) . "/master/version-control.json";
                     Puc_v4_Factory::buildUpdateChecker(
                         $hosted_json,
