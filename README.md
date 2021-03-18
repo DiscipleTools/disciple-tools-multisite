@@ -23,6 +23,7 @@ provides tools to overcome.
 - Adds Mapbox Key manager
 - Adds Network Dashboard authorization manager
 - Adds Movement Maps authorization manager
+- Helps keep theme and plugins up to date
 
 #### Will Not Do
 
