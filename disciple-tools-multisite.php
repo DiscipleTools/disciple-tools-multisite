@@ -3,7 +3,7 @@
  * Plugin Name: Disciple Tools - Multisite
  * Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Description: Disciple Tools Multisite plugin adds network administration utilities to the multisite network admin area, helpful for managing Disciple Tools multisite installs.
- * Version:  1.6.2
+ * Version:  1.7
  * Author URI: https://github.com/DiscipleTools
  * GitHub Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Requires at least: 4.7.0
@@ -18,6 +18,7 @@
  * @version 1.2 Added support for the Network Dashboard and the Network Dashboard Remote plugins.
  * @version 1.3 Disciple Tools 1.0 support
  * @version 1.4 Changed version control. Added mapbox key bulk utility.
+ * @version 1.7 Added enumerator to the sites table
  */
 
 
