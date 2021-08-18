@@ -103,6 +103,7 @@ class DT_Multisite {
             require_once( 'includes/tab-multisite-migration.php' );
             require_once( 'includes/tab-movement-maps-stats-plugin.php' );
             require_once( 'includes/admin-page.php' );
+            require_once( 'includes/add-colum-to-sites-list.php' );
         }
 
         if ( is_admin() || is_network_admin() ) {
