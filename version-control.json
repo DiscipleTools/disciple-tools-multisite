@@ -1,8 +1,8 @@
 {
-  "name": "Disciple Tools - Multisite Configuration",
+  "name": "Disciple.Tools - Multisite Configuration",
   "version": "1.7",
   "last_updated": "2021-02",
-  "author": "Disciple Tools",
+  "author": "Disciple.Tools",
   "author_homepage": "https://disciple.tools",
   "git_owner": "DiscipleTools",
   "git_repo": "disciple-tools-multisite",
@@ -23,7 +23,7 @@
   },
   "icon": "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-multisite/master/includes/admin/multisite-icon.png",
   "sections": {
-    "description": "Disciple Tools - Multisite",
+    "description": "Disciple.Tools - Multisite",
     "installation": "(Required) You must have Disciple.Tools Theme installed before using this plugin. Once Disciple.Tools is installed, you can use the normal Plugin system to install the plugin.",
     "changelog": ""
   }
