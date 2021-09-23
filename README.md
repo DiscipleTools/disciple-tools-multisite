@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/DiscipleTools/disciple-tools-multisite.svg?branch=master)](https://travis-ci.com/DiscipleTools/disciple-tools-multisite)
 
-![Multisite](https://raw.githubusercontent.com/DiscipleTools/disciple-tools-multisite/master/includes/admin/multisite-banner.png)
+![Plugin Banner](https://raw.githubusercontent.com/DiscipleTools/disciple-tools-multisite/master/includes/admin/multisite-banner.png)
 # Disciple.Tools - Multisite
 
 Add specialized administration tools for Super Admins managing a Disciple.Tools multisite server. We highly recommend this plugin
