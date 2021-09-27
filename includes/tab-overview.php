@@ -18,6 +18,7 @@ class DT_Multisite_Tab_Overview
 
                         <?php $this->overview_message() ?>
                         <?php $this->network_upgrade() ?>
+                        <?php $this->blocked_sites() ?>
 
                         <!-- End Main Column -->
                     </div><!-- end post-body-content -->
@@ -119,6 +120,63 @@ class DT_Multisite_Tab_Overview
                     }
                 })</script>
         <?php endif; ?>
+        <br>
+        <!-- End Box -->
+        <?php
+    }
+
+    public function blocked_sites(){
+        global $wpdb;
+
+        $sites = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->base_prefix}blogs;" );
+        $list = [];
+        if ( ! empty( $sites ) ) {
+            foreach ( $sites as $site ) {
+                if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
+                    $locked = get_blog_option( $site, "dt_migration_lock", 0 );
+                    if ( !empty( $locked ) ){
+                        $list[$site] = [ 'locked' => true ];
+                        $list[$site]['url'] = get_blog_option( $site, 'siteurl' );
+                    }
+                }
+            }
+        }
+        ?>
+        <!-- Box -->
+        <table class="widefat striped">
+            <thead>
+            <tr>
+                <th>Migration Issues</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    <dl>
+                        <dt>
+                            These sites for database migration issues:
+                        </dt>
+                    </dl>
+                </td>
+            </tr>
+            <tr>
+                <td id="list">
+                    <ul>
+                    <?php
+                    foreach ( $list as $l => $value ) : ?>
+                        <li>
+                            <a target="_blank" href="<?php echo esc_html( $value["url"] . "/wp-admin/admin.php?page=dt_utilities" ); ?>"><?php echo esc_html( $value["url"] ); ?></a>
+                        </li>
+                    <?php endforeach;
+                    if ( empty( $list ) ) : ?>
+                        <li>No sites have migration issues.</li>
+                    <?php endif; ?>
+                    </ul>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
         <br>
         <!-- End Box -->
         <?php
