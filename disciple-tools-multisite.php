@@ -3,7 +3,7 @@
  *Plugin Name: Disciple.Tools - Multisite
  * Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Description: Disciple Tools Multisite plugin adds network administration utilities to the multisite network admin area, helpful for managing Disciple Tools multisite installs.
- * Version:  1.7
+ * Version:  1.8
  * Author URI: https://github.com/DiscipleTools
  * GitHub Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Requires at least: 4.7.0
@@ -242,8 +242,13 @@ add_action( 'plugins_loaded', function (){
         foreach ( $plugins as $plugin_path => $plugin ){
             if ( isset( $plugin["TextDomain"] ) && strpos( $plugin["TextDomain"], "disciple-tools" ) !== false ){
                 $plugin_folder = ABSPATH . 'wp-content/plugins/' . $plugin["TextDomain"];
+                $dont_update = get_option( 'dt_multisite_dont_update_list', [] );
                 if ( file_exists( $plugin_folder . '/version-control.json' ) && isset( $plugin["PluginURI"] ) && !empty( $plugin["PluginURI"] ) ){
                     $hosted_json = str_replace( "github.com", "raw.githubusercontent.com", $plugin["PluginURI"] ) . "/master/version-control.json";
+                    //don't keep retrying failed updates
+                    if ( isset( $dont_update[$hosted_json] ) && $dont_update[$hosted_json] > time() - DAY_IN_SECONDS * 30 ){
+                        continue;
+                    }
                     Puc_v4_Factory::buildUpdateChecker(
                         $hosted_json,
                         ABSPATH . 'wp-content/plugins/' . $plugin_path,
@@ -253,4 +258,11 @@ add_action( 'plugins_loaded', function (){
             }
         }
     }
+    //catch plugin update errors and save url that fail
+    add_action('puc_api_error', function ( $result, $url, $slug ){
+        $dont_update = get_option( 'dt_multisite_dont_update_list', [] );
+        $slug = strtok( $slug, '?' );
+        $dont_update[$slug] = time();
+        update_option( 'dt_multisite_dont_update_list', $dont_update );
+    }, 10, 3);
 } );
