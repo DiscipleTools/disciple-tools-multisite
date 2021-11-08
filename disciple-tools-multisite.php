@@ -30,9 +30,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * MAKE DISCIPLE TOOLS DEFAULT THEME
  */
 if ( ! defined( 'WP_DEFAULT_THEME' ) ) {
-    if ( file_exists( ABSPATH . 'wp-content/themes/disciple-tools-theme/functions.php' )) {
+    if ( file_exists( ABSPATH . 'wp-content/themes/disciple-tools-theme/functions.php' ) ) {
         define( 'WP_DEFAULT_THEME', 'disciple-tools-theme' );
-    } elseif (file_exists( ABSPATH . 'wp-content/themes/disciple-tools-theme-master/functions.php' ) ){
+    } elseif ( file_exists( ABSPATH . 'wp-content/themes/disciple-tools-theme-master/functions.php' ) ){
         define( 'WP_DEFAULT_THEME', 'disciple-tools-theme-master' );
     }
 }
@@ -224,14 +224,17 @@ if ( is_multisite() && ( is_network_admin() || wp_doing_cron() ) ){
 add_action( 'plugins_loaded', function (){
     if ( is_multisite() && ( is_network_admin() || wp_doing_cron() ) ){
         // find the Disciple.Tools theme and load the plugin update checker.
-        foreach ( wp_get_themes() as $theme ){
-            if ( $theme->get( 'TextDomain' ) === "disciple_tools" && file_exists( $theme->get_stylesheet_directory() . '/dt-core/libraries/plugin-update-checker/plugin-update-checker.php' ) ){
-                if ( class_exists( 'Puc_v4_Factory' ) ) {
-                    Puc_v4_Factory::buildUpdateChecker(
-                        'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/disciple-tools-theme-version-control.json',
-                        $theme->get_stylesheet_directory(),
-                        basename( $theme->get_stylesheet_directory() )
-                    );
+        $current_theme = wp_get_theme();
+        if ( $current_theme->get_stylesheet() !== "disciple-tools-theme" ){
+            foreach ( wp_get_themes() as $theme ){
+                if ( $theme->get( 'TextDomain' ) === "disciple_tools" && file_exists( $theme->get_stylesheet_directory() . '/dt-core/libraries/plugin-update-checker/plugin-update-checker.php' ) ){
+                    if ( class_exists( 'Puc_v4_Factory' ) ){
+                        Puc_v4_Factory::buildUpdateChecker(
+                            'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/disciple-tools-theme-version-control.json',
+                            $theme->get_stylesheet_directory(),
+                            basename( $theme->get_stylesheet_directory() )
+                        );
+                    }
                 }
             }
         }
@@ -239,21 +242,27 @@ add_action( 'plugins_loaded', function (){
             include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
         }
         $plugins = get_plugins();
+        $dont_update = get_option( 'dt_multisite_dont_update_list', [] );
         foreach ( $plugins as $plugin_path => $plugin ){
             if ( isset( $plugin["TextDomain"] ) && strpos( $plugin["TextDomain"], "disciple-tools" ) !== false ){
                 $plugin_folder = ABSPATH . 'wp-content/plugins/' . $plugin["TextDomain"];
-                $dont_update = get_option( 'dt_multisite_dont_update_list', [] );
                 if ( file_exists( $plugin_folder . '/version-control.json' ) && isset( $plugin["PluginURI"] ) && !empty( $plugin["PluginURI"] ) ){
                     $hosted_json = str_replace( "github.com", "raw.githubusercontent.com", $plugin["PluginURI"] ) . "/master/version-control.json";
                     //don't keep retrying failed updates
                     if ( isset( $dont_update[$hosted_json] ) && $dont_update[$hosted_json] > time() - DAY_IN_SECONDS * 30 ){
                         continue;
                     }
-                    Puc_v4_Factory::buildUpdateChecker(
-                        $hosted_json,
-                        ABSPATH . 'wp-content/plugins/' . $plugin_path,
-                        "multi" . $plugin["TextDomain"]
-                    );
+                    //don't set if already being set by a plugin
+                    $slug_check_filter = 'puc_is_slug_in_use-' . $plugin["TextDomain"];
+                    $slug_used_by = apply_filters( $slug_check_filter, false );
+                    if ( empty( $slug_used_by ) ){
+                        Puc_v4_Factory::buildUpdateChecker(
+                            $hosted_json,
+                            ABSPATH . 'wp-content/plugins/' . $plugin_path,
+                            "multi" . $plugin["TextDomain"],
+                            24
+                        );
+                    }
                 }
             }
         }
