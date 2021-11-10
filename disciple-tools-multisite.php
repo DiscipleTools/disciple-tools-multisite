@@ -3,7 +3,7 @@
  *Plugin Name: Disciple.Tools - Multisite
  * Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Description: Disciple Tools Multisite plugin adds network administration utilities to the multisite network admin area, helpful for managing Disciple Tools multisite installs.
- * Version:  1.8
+ * Version:  1.9
  * Author URI: https://github.com/DiscipleTools
  * GitHub Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Requires at least: 4.7.0
@@ -103,6 +103,8 @@ class DT_Multisite {
             require_once( 'includes/tab-mapbox-keys.php' );
             require_once( 'includes/tab-multisite-migration.php' );
             require_once( 'includes/tab-movement-maps-stats-plugin.php' );
+            require_once( 'includes/tab-ipstack.php' );
+            require_once( 'includes/tab-google.php' );
             require_once( 'includes/admin-page.php' );
             require_once( 'includes/add-colum-to-sites-list.php' );
         }

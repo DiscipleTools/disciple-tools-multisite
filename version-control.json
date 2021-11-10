@@ -1,6 +1,6 @@
 {
   "name": "Disciple.Tools - Multisite Configuration",
-  "version": "1.8",
+  "version": "1.9",
   "last_updated": "2021-10",
   "author": "Disciple.Tools",
   "author_homepage": "https://disciple.tools",
@@ -15,7 +15,7 @@
   "license_url": "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-multisite/master/LICENSE",
   "readme_url": "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-multisite/master/README.md",
   "requires": "4.7",
-  "tested": "5.6",
+  "tested": "5.8",
   "upgrade_notice": "Upgrade to get the latest features.",
   "banners": {
     "low": "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-multisite/master/includes/admin/multisite-banner.png",

@@ -45,6 +45,14 @@ function dt_multisite_network_admin_content(){
                 <?php echo ( $tab == 'mapbox_keys' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
                 <?php echo esc_attr( 'Mapbox Keys' ) ?>
             </a>
+            <a href="<?php echo esc_attr( $link ) . 'google_keys' ?>" class="nav-tab
+                <?php echo ( $tab == 'google_keys' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
+                <?php echo esc_attr( 'Google Keys' ) ?>
+            </a>
+            <a href="<?php echo esc_attr( $link ) . 'ipstack_keys' ?>" class="nav-tab
+                <?php echo ( $tab == 'ipstack_keys' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
+                <?php echo esc_attr( 'IpStack Keys' ) ?>
+            </a>
             <?php
             if ( isset( $plugins_installed['disciple-tools-network-dashboard/disciple-tools-network-dashboard.php'] ) || isset( $mu_plugins['disciple-tools-network-dashboard/disciple-tools-network-dashboard.php'] ) ) {
                 ?>
@@ -83,6 +91,14 @@ function dt_multisite_network_admin_content(){
                 break;
             case "mapbox_keys":
                 $object = new DT_Multisite_Tab_Mapbox_Keys();
+                $object->content();
+                break;
+            case "google_keys":
+                $object = new DT_Multisite_Tab_Google_Keys();
+                $object->content();
+                break;
+            case "ipstack_keys":
+                $object = new DT_Multisite_Tab_Ipstack_Keys();
                 $object->content();
                 break;
             case "movement_maps":
