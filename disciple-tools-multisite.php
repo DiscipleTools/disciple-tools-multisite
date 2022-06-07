@@ -245,26 +245,25 @@ add_action( 'plugins_loaded', function (){
         }
         $plugins = get_plugins();
         $dont_update = get_option( 'dt_multisite_dont_update_list', [] );
-        foreach ( $plugins as $plugin_path => $plugin ){
-            if ( isset( $plugin["TextDomain"] ) ){
-                $plugin_folder = ABSPATH . 'wp-content/plugins/' . $plugin["TextDomain"];
-                if ( file_exists( $plugin_folder . '/version-control.json' ) && isset( $plugin["PluginURI"] ) && !empty( $plugin["PluginURI"] ) ){
-                    $hosted_json = str_replace( "github.com", "raw.githubusercontent.com", $plugin["PluginURI"] ) . "/master/version-control.json";
-                    //don't keep retrying failed updates
-                    if ( isset( $dont_update[$hosted_json] ) && $dont_update[$hosted_json] > time() - DAY_IN_SECONDS * 30 ){
-                        continue;
-                    }
-                    //don't set if already being set by a plugin
-                    $slug_check_filter = 'puc_is_slug_in_use-' . $plugin["TextDomain"];
-                    $slug_used_by = apply_filters( $slug_check_filter, false );
-                    if ( empty( $slug_used_by ) ){
-                        Puc_v4_Factory::buildUpdateChecker(
-                            $hosted_json,
-                            ABSPATH . 'wp-content/plugins/' . $plugin_path,
-                            "multi" . $plugin["TextDomain"],
-                            24
-                        );
-                    }
+        foreach ( $plugins as $plugin_key => $plugin ){
+            $plugin_folder_name = explode( '/', $plugin_key )[0];
+            $plugin_path = trailingslashit( WP_PLUGIN_DIR ) . $plugin_folder_name;
+            if ( file_exists( $plugin_path . '/version-control.json' ) && isset( $plugin["PluginURI"] ) && !empty( $plugin["PluginURI"] ) ){
+                $hosted_json = str_replace( "github.com", "raw.githubusercontent.com", $plugin["PluginURI"] ) . "/master/version-control.json";
+                //don't keep retrying failed updates
+                if ( isset( $dont_update[$hosted_json] ) && $dont_update[$hosted_json] > time() - DAY_IN_SECONDS * 30 ){
+                    continue;
+                }
+                //don't set if already being set by a plugin
+                $slug_check_filter = 'puc_is_slug_in_use-' . $plugin_folder_name;
+                $slug_used_by = apply_filters( $slug_check_filter, false );
+                if ( empty( $slug_used_by ) ){
+                    Puc_v4_Factory::buildUpdateChecker(
+                        $hosted_json,
+                        trailingslashit( WP_PLUGIN_DIR ) . $plugin_key,
+                        "multi" . $plugin_folder_name,
+                        24
+                    );
                 }
             }
         }
