@@ -65,6 +65,9 @@ if ( !class_exists('Puc_v4p10_Factory', false) ):
 		 * @return Puc_v4p10_Plugin_UpdateChecker|Puc_v4p10_Theme_UpdateChecker|Puc_v4p10_Vcs_BaseChecker
 		 */
 		public static function buildUpdateChecker($metadataUrl, $fullPath, $slug = '', $checkPeriod = 12, $optionName = '', $muPluginFile = '') {
+			if ( !is_main_site() ){
+				return null;
+			}
 			$fullPath = self::normalizePath($fullPath);
 			$id = null;
 
