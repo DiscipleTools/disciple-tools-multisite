@@ -217,8 +217,6 @@ register_deactivation_hook( __FILE__, [ 'DT_Multisite', 'deactivation' ] );
 /**
  * Make the update checker available on multisites when the default theme is not Disciple.Tools
  */
-if ( is_multisite() && ( is_network_admin() || wp_doing_cron() ) ){
-}
 if ( !class_exists( 'Puc_v4_Factory' ) ){
     require( "includes/admin/plugin-update-checker/plugin-update-checker.php" );
 }
