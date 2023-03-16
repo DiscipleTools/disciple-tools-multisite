@@ -217,14 +217,12 @@ register_deactivation_hook( __FILE__, [ 'DT_Multisite', 'deactivation' ] );
 /**
  * Make the update checker available on multisites when the default theme is not Disciple.Tools
  */
-if ( is_multisite() && ( is_network_admin() || wp_doing_cron() ) ){
-    if ( !class_exists( 'Puc_v4_Factory' ) ){
-        require( "includes/admin/plugin-update-checker/plugin-update-checker.php" );
-    }
+if ( !class_exists( 'Puc_v4_Factory' ) ){
+    require( "includes/admin/plugin-update-checker/plugin-update-checker.php" );
 }
 
 add_action( 'plugins_loaded', function (){
-    if ( is_multisite() && ( is_network_admin() || wp_doing_cron() ) ){
+    if ( is_multisite() && ( is_network_admin() || wp_doing_cron() ) && is_main_site() ){
         // find the Disciple.Tools theme and load the plugin update checker.
         $current_theme = wp_get_theme();
         if ( $current_theme->get_stylesheet() !== "disciple-tools-theme" ){
@@ -275,4 +273,19 @@ add_action( 'plugins_loaded', function (){
         $dont_update[$slug] = time();
         update_option( 'dt_multisite_dont_update_list', $dont_update );
     }, 10, 3);
+
+
+    if ( !is_main_site() ){
+        $cron_jobs = get_option( 'cron', [] );
+        foreach ( $cron_jobs as $timestamp => $cron ){
+            if ( is_array( $cron ) ){
+                foreach ( $cron as $hook => $data ){
+                    if ( strpos( $hook, 'puc' ) !== false ){
+                        wp_unschedule_event( $timestamp, $hook );
+                    }
+                }
+            }
+        }
+    }
 } );
+

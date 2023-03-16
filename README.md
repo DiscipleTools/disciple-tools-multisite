@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/DiscipleTools/disciple-tools-multisite.svg?branch=master)](https://travis-ci.com/DiscipleTools/disciple-tools-multisite)
+![Build Status](https://github.com/DiscipleTools/disciple-tools-multisite/actions/workflows/ci.yml/badge.svg?branch=master)
 
 ![Plugin Banner](https://raw.githubusercontent.com/DiscipleTools/disciple-tools-multisite/master/includes/admin/multisite-banner.png)
 # Disciple.Tools - Multisite
