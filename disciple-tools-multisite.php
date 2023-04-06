@@ -203,7 +203,7 @@ class DT_Multisite {
      * @access public
      */
     public function __call( $method = '', $args = array() ) {
-        _doing_it_wrong( "dt_multisite::" . esc_html( $method ), 'Method does not exist.', '0.1' );
+        _doing_it_wrong( 'dt_multisite::' . esc_html( $method ), 'Method does not exist.', '0.1' );
         unset( $method, $args );
         return null;
     }
@@ -218,16 +218,17 @@ register_deactivation_hook( __FILE__, [ 'DT_Multisite', 'deactivation' ] );
  * Make the update checker available on multisites when the default theme is not Disciple.Tools
  */
 if ( !class_exists( 'Puc_v4_Factory' ) ){
-    require( "includes/admin/plugin-update-checker/plugin-update-checker.php" );
+    require( 'includes/admin/plugin-update-checker/plugin-update-checker.php' );
 }
 
 add_action( 'plugins_loaded', function (){
-    if ( is_multisite() && ( is_network_admin() || wp_doing_cron() ) && is_main_site() ){
+    $is_updating_plugin = isset( $_POST['action'] ) && $_POST['action'] === 'update-plugin'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+    if ( is_multisite() && ( is_network_admin() || wp_doing_cron() || $is_updating_plugin ) && is_main_site() ){
         // find the Disciple.Tools theme and load the plugin update checker.
         $current_theme = wp_get_theme();
-        if ( $current_theme->get_stylesheet() !== "disciple-tools-theme" ){
+        if ( $current_theme->get_stylesheet() !== 'disciple-tools-theme' ){
             foreach ( wp_get_themes() as $theme ){
-                if ( $theme->get( 'TextDomain' ) === "disciple_tools" && file_exists( $theme->get_stylesheet_directory() . '/dt-core/libraries/plugin-update-checker/plugin-update-checker.php' ) ){
+                if ( $theme->get( 'TextDomain' ) === 'disciple_tools' && file_exists( $theme->get_stylesheet_directory() . '/dt-core/libraries/plugin-update-checker/plugin-update-checker.php' ) ){
                     if ( class_exists( 'Puc_v4_Factory' ) ){
                         Puc_v4_Factory::buildUpdateChecker(
                             'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/disciple-tools-theme-version-control.json',
@@ -246,8 +247,8 @@ add_action( 'plugins_loaded', function (){
         foreach ( $plugins as $plugin_key => $plugin ){
             $plugin_folder_name = explode( '/', $plugin_key )[0];
             $plugin_path = trailingslashit( WP_PLUGIN_DIR ) . $plugin_folder_name;
-            if ( file_exists( $plugin_path . '/version-control.json' ) && isset( $plugin["PluginURI"] ) && !empty( $plugin["PluginURI"] ) ){
-                $hosted_json = str_replace( "github.com", "raw.githubusercontent.com", $plugin["PluginURI"] ) . "/master/version-control.json";
+            if ( file_exists( $plugin_path . '/version-control.json' ) && isset( $plugin['PluginURI'] ) && !empty( $plugin['PluginURI'] ) ){
+                $hosted_json = str_replace( 'github.com', 'raw.githubusercontent.com', $plugin['PluginURI'] ) . '/master/version-control.json';
                 //don't keep retrying failed updates
                 if ( isset( $dont_update[$hosted_json] ) && $dont_update[$hosted_json] > time() - DAY_IN_SECONDS * 30 ){
                     continue;
@@ -259,7 +260,7 @@ add_action( 'plugins_loaded', function (){
                     Puc_v4_Factory::buildUpdateChecker(
                         $hosted_json,
                         trailingslashit( WP_PLUGIN_DIR ) . $plugin_key,
-                        "multi" . $plugin_folder_name,
+                        'multi' . $plugin_folder_name,
                         24
                     );
                 }
