@@ -12,7 +12,7 @@ function dt_multisite_token(){
  */
 add_action( 'network_admin_menu', 'dt_multisite_network_admin_menu', 10, 2 );
 function dt_multisite_network_admin_menu(){
-    add_menu_page( 'Disciple Tools', 'Disciple Tools', 'manage_options', dt_multisite_token(), 'dt_multisite_network_admin_content', 'dashicons-admin-tools' );
+    add_menu_page( 'Disciple.Tools', 'Disciple.Tools', 'manage_options', dt_multisite_token(), 'dt_multisite_network_admin_content', 'dashicons-admin-tools' );
 }
 function dt_multisite_network_admin_content(){
     if ( ! current_user_can( 'manage_options' ) ) { // manage dt is a permission that is specific to Disciple Tools and allows admins, strategists and dispatchers into the wp-admin
