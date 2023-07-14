@@ -78,6 +78,7 @@ function dt_multisite() {
     return false;
 }
 add_action( 'init', 'dt_multisite' );
+require_once( 'includes/wp-migrate-pro.php' );
 
 class DT_Multisite {
 
