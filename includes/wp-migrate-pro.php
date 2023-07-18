@@ -73,7 +73,7 @@ add_filter('wpmdb_get_alter_queries', function ( $queries, $state_data ){
     $additional_queries[]['query'] = "
                     UPDATE `{$target_prefix}options` as o,`{$wpdb->prefix}users` AS u
                     SET o.option_value = u.id
-                    WHERE o.option_name = 'base_user'
+                    WHERE o.option_name = 'dt_base_user'
                     AND o.option_value = u.wpmdb_user_id
                     ;\n";
 
