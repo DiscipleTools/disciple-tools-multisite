@@ -272,7 +272,7 @@ add_action( 'plugins_loaded', function (){
     //catch plugin update errors and save url that fail
     add_action('puc_api_error', function ( $result, $url, $slug ){
         $dont_update = get_option( 'dt_multisite_dont_update_list', [] );
-        $slug = strtok( $slug, '?' );
+        $slug = strtok( $slug ?: '', '?' );
         $dont_update[$slug] = time();
         update_option( 'dt_multisite_dont_update_list', $dont_update );
     }, 10, 3);

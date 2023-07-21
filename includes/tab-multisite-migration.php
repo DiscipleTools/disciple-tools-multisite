@@ -504,7 +504,7 @@ class DT_Multisite_Tab_Import_Subsite {
             if ( !isset( $cached["migrations_run"] ) ) {
                 switch_to_blog( $cached["site_id"] );
                 new Disciple_Tools();
-                Disciple_Tools_Migration_Engine::migrate( disciple_tools()->migration_number );
+                Disciple_Tools_Migration_Engine::migrate( Disciple_Tools_Migration_Engine::$migration_number );
                 restore_current_blog();
                 $cached["migrations_run"] = true;
                 $cached["progress"]++;
