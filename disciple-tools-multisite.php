@@ -219,10 +219,9 @@ register_deactivation_hook( __FILE__, [ 'DT_Multisite', 'deactivation' ] );
 /**
  * Make the update checker available on multisites when the default theme is not Disciple.Tools
  */
-if ( !class_exists( 'Puc_v4_Factory' ) ){
-    require( 'includes/admin/plugin-update-checker/plugin-update-checker.php' );
-}
+require( 'includes/admin/plugin-update-checker/plugin-update-checker.php' );
 
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 add_action( 'plugins_loaded', function (){
     $is_updating_plugin = isset( $_POST['action'] ) && $_POST['action'] === 'update-plugin'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
     if ( is_multisite() && ( is_network_admin() || wp_doing_cron() || $is_updating_plugin ) && is_main_site() ){
@@ -231,13 +230,11 @@ add_action( 'plugins_loaded', function (){
         if ( $current_theme->get_stylesheet() !== 'disciple-tools-theme' ){
             foreach ( wp_get_themes() as $theme ){
                 if ( $theme->get( 'TextDomain' ) === 'disciple_tools' && file_exists( $theme->get_stylesheet_directory() . '/dt-core/libraries/plugin-update-checker/plugin-update-checker.php' ) ){
-                    if ( class_exists( 'Puc_v4_Factory' ) ){
-                        Puc_v4_Factory::buildUpdateChecker(
-                            'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/disciple-tools-theme-version-control.json',
-                            $theme->get_stylesheet_directory(),
-                            basename( $theme->get_stylesheet_directory() )
-                        );
-                    }
+                    PucFactory::buildUpdateChecker(
+                        'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/disciple-tools-theme-version-control.json',
+                        $theme->get_stylesheet_directory(),
+                        basename( $theme->get_stylesheet_directory() )
+                    );
                 }
             }
         }
@@ -259,7 +256,7 @@ add_action( 'plugins_loaded', function (){
                 $slug_check_filter = 'puc_is_slug_in_use-' . $plugin_folder_name;
                 $slug_used_by = apply_filters( $slug_check_filter, false );
                 if ( empty( $slug_used_by ) ){
-                    Puc_v4_Factory::buildUpdateChecker(
+                    PucFactory::buildUpdateChecker(
                         $hosted_json,
                         trailingslashit( WP_PLUGIN_DIR ) . $plugin_key,
                         'multi' . $plugin_folder_name,
