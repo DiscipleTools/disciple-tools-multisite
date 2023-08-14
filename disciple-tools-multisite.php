@@ -222,7 +222,6 @@ register_deactivation_hook( __FILE__, [ 'DT_Multisite', 'deactivation' ] );
 require( 'includes/admin/plugin-update-checker/plugin-update-checker.php' );
 
 if ( !function_exists( 'is_wppusher_managing_plugin' ) ) {
-
     /**
      * Utility function to check if wppusher is managing a plugin
      *
@@ -240,9 +239,13 @@ if ( !function_exists( 'is_wppusher_managing_plugin' ) ) {
         if ( class_exists( '\Pusher\Storage\PackageModel' ) ) {
             $table_name = pusherTableName();
 
-            $model = new \Pusher\Storage\PackageModel(array('package' => $file));
+            $model = new \Pusher\Storage\PackageModel( array( 'package' => $file ) );
 
-            $row = $wpdb->get_row("SELECT * FROM $table_name WHERE type = 1 AND package = '{$model->package}'");
+            $row = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM %s
+                WHERE type = 1
+                AND package = '{%s}'
+            " ), $table_name, $model->package );
         }
 
         if ( !$row ) {
@@ -251,12 +254,11 @@ if ( !function_exists( 'is_wppusher_managing_plugin' ) ) {
 
         return true;
     }
-
 }
 
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 add_action( 'plugins_loaded', function (){
-    include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+    include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
     $is_wppusher_active = is_plugin_active( 'wppusher/wppusher.php' );
 
