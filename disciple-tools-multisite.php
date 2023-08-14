@@ -221,8 +221,64 @@ register_deactivation_hook( __FILE__, [ 'DT_Multisite', 'deactivation' ] );
  */
 require( 'includes/admin/plugin-update-checker/plugin-update-checker.php' );
 
+if ( !function_exists( 'is_wppusher_managing_plugin' ) ) {
+
+    /**
+     * Utility function to check if wppusher is managing a plugin
+     *
+     * $file is the relative plugin file relative to the plugins directory.
+     * E.g. my-awesome-plugin/my-awesome-plugin.php
+     *
+     * @param string $file
+     * @return bool
+     */
+    function is_wppusher_managing_plugin( string $file ) {
+        global $wpdb;
+
+        $row = null;
+
+        if ( class_exists( '\Pusher\Storage\PackageModel' ) ) {
+            $table_name = pusherTableName();
+
+            $model = new \Pusher\Storage\PackageModel(array('package' => $file));
+
+            $row = $wpdb->get_row("SELECT * FROM $table_name WHERE type = 1 AND package = '{$model->package}'");
+        }
+
+        if ( !$row ) {
+            return false;
+        }
+
+        return true;
+    }
+
+}
+
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 add_action( 'plugins_loaded', function (){
+    include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+
+    $is_wppusher_active = is_plugin_active( 'wppusher/wppusher.php' );
+
+    $file = basename( __DIR__ ) . '/' . basename( __FILE__ );
+
+    /* Don't enable Puc if wppusher is managing this plugin */
+    if ( $is_wppusher_active && is_wppusher_managing_plugin( $file ) ) {
+        return;
+    }
+
+    /**
+     * If wppusher is not managing this plugin, then there is a conflict over the wp filter
+     * upgrader_source_selection where the Puc corrupts the source that wppusher is expecting
+     * for other plugins.
+     *
+     * In this case, don't load Puc and warn the network admin of the conflict
+     */
+    if ( $is_wppusher_active && !is_wppusher_managing_plugin( $file ) ) {
+        add_action( 'network_admin_notices', 'zume_admin_notice_conflicting_updaters' );
+        return;
+    }
+
     $is_updating_plugin = isset( $_POST['action'] ) && $_POST['action'] === 'update-plugin'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
     if ( is_multisite() && ( is_network_admin() || wp_doing_cron() || $is_updating_plugin ) && is_main_site() ){
         // find the Disciple.Tools theme and load the plugin update checker.
@@ -267,12 +323,12 @@ add_action( 'plugins_loaded', function (){
         }
     }
     //catch plugin update errors and save url that fail
-    add_action('puc_api_error', function ( $result, $url, $slug ){
+    add_action('puc_api_error', function ( $status, $result, $url, $slug ){
         $dont_update = get_option( 'dt_multisite_dont_update_list', [] );
         $slug = strtok( $slug ?: '', '?' );
         $dont_update[$slug] = time();
         update_option( 'dt_multisite_dont_update_list', $dont_update );
-    }, 10, 3);
+    }, 10, 4);
 
 
     if ( !is_main_site() ){
@@ -289,3 +345,13 @@ add_action( 'plugins_loaded', function (){
     }
 } );
 
+function zume_admin_notice_conflicting_updaters() {
+    ?>
+    <div class="notice notice-error">
+        <h2><?php echo esc_html( 'Disciple Tools Multisite Plugin Updater Conflict' );?></h2>
+        <p><?php echo esc_html( 'WPPusher is active and is conflicting with the Plugin updater within this plugin.' );?></p>
+        <p><?php echo esc_html( 'While WPPusher is active this plugin\'s internal updater is deactivated to prevent the conflict with wppusher.' );?></p>
+        <p><?php echo esc_html( 'To update this plugin either use WPPusher to manage it, or deactivate WPPusher to use the internal updater' );?></p>
+    </div>
+    <?php
+}
