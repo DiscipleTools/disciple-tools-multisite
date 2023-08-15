@@ -242,10 +242,10 @@ if ( !function_exists( 'is_wppusher_managing_plugin' ) ) {
             $model = new \Pusher\Storage\PackageModel( array( 'package' => $file ) );
 
             $row = $wpdb->get_row( $wpdb->prepare(
-                "SELECT * FROM %s
+                "SELECT * FROM %1s
                 WHERE type = 1
-                AND package = '{%s}'
-            " ), $table_name, $model->package );
+                AND package = %s
+            ", $table_name, "{$model->package}" ) );
         }
 
         if ( !$row ) {
