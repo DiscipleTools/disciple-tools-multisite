@@ -224,7 +224,8 @@ require( 'includes/admin/plugin-update-checker/plugin-update-checker.php' );
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 add_action( 'plugins_loaded', function (){
     $is_updating_plugin = isset( $_POST['action'] ) && $_POST['action'] === 'update-plugin'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-    if ( is_multisite() && ( is_network_admin() || wp_doing_cron() || $is_updating_plugin ) && is_main_site() ){
+    $disable = isset( $_POST['wppusher'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+    if ( !$disable && is_multisite() && ( is_network_admin() || wp_doing_cron() || $is_updating_plugin ) && is_main_site() ){
         // find the Disciple.Tools theme and load the plugin update checker.
         $current_theme = wp_get_theme();
         if ( $current_theme->get_stylesheet() !== 'disciple-tools-theme' ){
