@@ -108,6 +108,7 @@ class DT_Multisite {
             require_once( 'includes/tab-google.php' );
             require_once( 'includes/admin-page.php' );
             require_once( 'includes/add-colum-to-sites-list.php' );
+            require_once( 'includes/sso-login.php' );
         }
 
         if ( is_admin() || is_network_admin() ) {
