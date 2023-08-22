@@ -133,7 +133,7 @@ class DT_Multisite_Tab_Overview
         if ( ! empty( $sites ) ) {
             foreach ( $sites as $site ) {
                 if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
-                    $locked = get_blog_option( $site, "dt_migration_lock", 0 );
+                    $locked = get_blog_option( $site, 'dt_migration_lock', 0 );
                     if ( !empty( $locked ) ){
                         $list[$site] = [ 'locked' => true ];
                         $list[$site]['url'] = get_blog_option( $site, 'siteurl' );
@@ -165,7 +165,7 @@ class DT_Multisite_Tab_Overview
                     <?php
                     foreach ( $list as $l => $value ) : ?>
                         <li>
-                            <a target="_blank" href="<?php echo esc_html( $value["url"] . "/wp-admin/admin.php?page=dt_utilities" ); ?>"><?php echo esc_html( $value["url"] ); ?></a>
+                            <a target="_blank" href="<?php echo esc_html( $value['url'] . '/wp-admin/admin.php?page=dt_utilities' ); ?>"><?php echo esc_html( $value['url'] ); ?></a>
                         </li>
                     <?php endforeach;
                     if ( empty( $list ) ) : ?>

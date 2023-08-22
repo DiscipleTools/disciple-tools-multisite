@@ -78,7 +78,7 @@ class DT_Movement_Maps_Tab_Network_Dashboard
         if ( isset( $_POST['movement_map_approved_nonce'] )
             && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['movement_map_approved_nonce'] ) ), 'movement_map_approved_' . get_current_user_id() ) ) {
 
-            if ( isset( $_POST['enable-all'] ) && ! empty( $_POST['enable-all'] ) && isset( $_POST['db_table'] ) && ! empty( $_POST['db_table'] )) {
+            if ( isset( $_POST['enable-all'] ) && ! empty( $_POST['enable-all'] ) && isset( $_POST['db_table'] ) && ! empty( $_POST['db_table'] ) ) {
                 $site_id = sanitize_key( wp_unslash( $_POST['enable-all'] ) );
 
                 $data_table = sanitize_text_field( wp_unslash( $_POST['db_table'] ) );
