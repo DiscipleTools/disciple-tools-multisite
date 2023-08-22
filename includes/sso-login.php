@@ -36,7 +36,7 @@ class DT_Multisite_Tab_SSO_Login {
 
 
 
-    public function content( ) {
+    public function content() {
 
         if ( !is_super_admin() ) {
             wp_die( 'You do not have sufficient permissions to access this page.' );
