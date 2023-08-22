@@ -97,11 +97,11 @@ class DT_Multisite_Tab_Google_Keys
         if ( ! empty( $sites ) ) {
             foreach ( $sites as $site ) {
                 if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
-                    $dt_setup_options = get_blog_option( $site, "dt_setup_options", [] );
+                    $dt_setup_options = get_blog_option( $site, 'dt_setup_options', [] );
                     $list[$site] = [];
                     $list[$site]['url'] = get_blog_option( $site, 'siteurl' );
                     $list[$site]['google_key'] = get_blog_option( $site, 'dt_google_map_key' );
-                    $list[$site]['locations_upgraded'] = isset( $dt_setup_options["google_upgrade"] );
+                    $list[$site]['locations_upgraded'] = isset( $dt_setup_options['google_upgrade'] );
                     $list['count']++;
                 }
             }

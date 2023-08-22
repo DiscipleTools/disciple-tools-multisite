@@ -19,8 +19,8 @@ function dt_multisite_network_admin_content(){
         wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.' ) );
     }
 
-    if ( isset( $_GET["tab"] ) ) {
-        $tab = sanitize_key( wp_unslash( $_GET["tab"] ) );
+    if ( isset( $_GET['tab'] ) ) {
+        $tab = sanitize_key( wp_unslash( $_GET['tab'] ) );
     } else {
         $tab = 'general';
     }
@@ -77,31 +77,31 @@ function dt_multisite_network_admin_content(){
 
         <?php
         switch ( $tab ) {
-            case "general":
+            case 'general':
                 $object = new DT_Multisite_Tab_Overview();
                 $object->content();
                 break;
-            case "network":
+            case 'network':
                 $object = new DT_Multisite_Tab_Network_Dashboard();
                 $object->content();
                 break;
-            case "import":
+            case 'import':
                 $object = new DT_Multisite_Tab_Import_Subsite();
                 $object->content();
                 break;
-            case "mapbox_keys":
+            case 'mapbox_keys':
                 $object = new DT_Multisite_Tab_Mapbox_Keys();
                 $object->content();
                 break;
-            case "google_keys":
+            case 'google_keys':
                 $object = new DT_Multisite_Tab_Google_Keys();
                 $object->content();
                 break;
-            case "ipstack_keys":
+            case 'ipstack_keys':
                 $object = new DT_Multisite_Tab_Ipstack_Keys();
                 $object->content();
                 break;
-            case "movement_maps":
+            case 'movement_maps':
                 $object = new DT_Movement_Maps_Tab_Network_Dashboard();
                 $object->content();
                 break;

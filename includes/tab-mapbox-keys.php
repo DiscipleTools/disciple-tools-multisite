@@ -99,11 +99,11 @@ class DT_Multisite_Tab_Mapbox_Keys
         if ( ! empty( $sites ) ) {
             foreach ( $sites as $site ) {
                 if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
-                    $dt_setup_options = get_blog_option( $site, "dt_setup_options", [] );
+                    $dt_setup_options = get_blog_option( $site, 'dt_setup_options', [] );
                     $list[$site] = [];
                     $list[$site]['url'] = get_blog_option( $site, 'siteurl' );
                     $list[$site]['mapbox_key'] = get_blog_option( $site, 'dt_mapbox_api_key' );
-                    $list[$site]['locations_upgraded'] = isset( $dt_setup_options["mapbox_upgrade"] );
+                    $list[$site]['locations_upgraded'] = isset( $dt_setup_options['mapbox_upgrade'] );
                     $list['count']++;
                 }
             }
@@ -137,7 +137,7 @@ class DT_Multisite_Tab_Mapbox_Keys
                             <button class="button btn" type="submit">Update</button>
                         </td>
                         <td>
-                            <?php if ( $site['mapbox_key'] ) { echo esc_html( $site["locations_upgraded"] ? "True" : "False" ); } ?>
+                            <?php if ( $site['mapbox_key'] ) { echo esc_html( $site['locations_upgraded'] ? 'True' : 'False' ); } ?>
                         </td>
                     </tr>
                 </form>
@@ -253,9 +253,9 @@ class DT_Multisite_Tab_Mapbox_Keys
                     if ( ! empty( $sites ) ) {
                         foreach ( $sites as $site ) {
                             if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
-                                $dt_setup_options = get_blog_option( $site, "dt_setup_options", [] );
+                                $dt_setup_options = get_blog_option( $site, 'dt_setup_options', [] );
                                 $api_key = get_blog_option( $site, 'dt_mapbox_api_key' );
-                                if ( $api_key && !isset( $dt_setup_options["mapbox_upgrade"] ) ){
+                                if ( $api_key && !isset( $dt_setup_options['mapbox_upgrade'] ) ){
                                     if ( !$site_to_update ){
                                         $site_to_update = $site;
                                     }
@@ -271,7 +271,7 @@ class DT_Multisite_Tab_Mapbox_Keys
                     $wpdb->dt_location_grid_meta = $wpdb->prefix . 'dt_location_grid_meta';
                     $wpdb->dt_location_grid = $wpdb->prefix . 'dt_location_grid';
                     require_once( get_template_directory() . '/dt-mapping/mapping-admin.php' );
-                    if ( !method_exists( DT_Mapping_Module_Admin::instance(), "get_record_count_with_no_location_meta" ) ){
+                    if ( !method_exists( DT_Mapping_Module_Admin::instance(), 'get_record_count_with_no_location_meta' ) ){
                         ?><tr><td><strong>This feature requires D.T v1.0.2 or later</strong><br><?php
                         return;
                     }
@@ -284,9 +284,9 @@ class DT_Multisite_Tab_Mapbox_Keys
                     $user_count = $user_location_wo_meta;
 
                     if ( empty( $count ) && empty( $user_count ) ){
-                        $dt_setup_options = get_option( "dt_setup_options", [] );
-                        $dt_setup_options["mapbox_upgrade"] = true;
-                        update_option( "dt_setup_options", $dt_setup_options );
+                        $dt_setup_options = get_option( 'dt_setup_options', [] );
+                        $dt_setup_options['mapbox_upgrade'] = true;
+                        update_option( 'dt_setup_options', $dt_setup_options );
                     }
                     $greater_than_limit = true;
 
@@ -306,7 +306,7 @@ class DT_Multisite_Tab_Mapbox_Keys
                             require_once( get_template_directory() . '/dt-mapping/location-grid-meta.php' );
                             require_once( get_template_directory() . '/dt-mapping/mapping-queries.php' );
 
-                            if ( !empty( $count )){
+                            if ( !empty( $count ) ){
                                 DT_Mapping_Module_Admin::instance()->upgrade_records_with_mapbox_meta_query();
                             } elseif ( !empty( $user_count ) ){
                                 DT_Mapping_Module_Admin::instance()->upgrade_users_with_mapbox_meta_query();
@@ -332,7 +332,7 @@ class DT_Multisite_Tab_Mapbox_Keys
                         setTimeout( "nextpage()", 1500 );
                     </script>
                     <?php
-                } else if ($continue) {
+                } else if ( $continue ) {
                     ?>
                         <script type="text/javascript">
                         function nextpage() {

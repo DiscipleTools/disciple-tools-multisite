@@ -97,11 +97,11 @@ class DT_Multisite_Tab_Ipstack_Keys
         if ( ! empty( $sites ) ) {
             foreach ( $sites as $site ) {
                 if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
-                    $dt_setup_options = get_blog_option( $site, "dt_setup_options", [] );
+                    $dt_setup_options = get_blog_option( $site, 'dt_setup_options', [] );
                     $list[$site] = [];
                     $list[$site]['url'] = get_blog_option( $site, 'siteurl' );
                     $list[$site]['ipstack_key'] = get_blog_option( $site, 'dt_ipstack_api_key' );
-                    $list[$site]['locations_upgraded'] = isset( $dt_setup_options["ipstack_upgrade"] );
+                    $list[$site]['locations_upgraded'] = isset( $dt_setup_options['ipstack_upgrade'] );
                     $list['count']++;
                 }
             }

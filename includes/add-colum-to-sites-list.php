@@ -7,7 +7,7 @@
  *
  * @return array
  */
-function disciple_tools_multisite_blogs_columns( $sites_columns) {
+function disciple_tools_multisite_blogs_columns( $sites_columns ) {
     $sites_columns['blogid'] = 'Site ID';
     return $sites_columns;
 }
@@ -21,7 +21,7 @@ add_filter( 'wpmu_blogs_columns', 'disciple_tools_multisite_blogs_columns' );
  *
  * @return void
  */
-function disciple_tools_multisite_sites_custom_column( $column_name, $blog_id) {
+function disciple_tools_multisite_sites_custom_column( $column_name, $blog_id ) {
     if ( $column_name == 'blogid' ) {
         echo esc_attr( $blog_id );
     }
