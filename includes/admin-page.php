@@ -19,7 +19,7 @@ function dt_multisite_network_admin_content(){
         wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.' ) );
     }
 
-    if ( isset( $_GET['tab'] ) ) {
+    if ( isset( $_GET['tab'] ) ){
         $tab = sanitize_key( wp_unslash( $_GET['tab'] ) );
     } else {
         $tab = 'general';
@@ -72,6 +72,10 @@ function dt_multisite_network_admin_content(){
                 }
             }
             ?>
+            <a href="<?php echo esc_attr( $link ) . 'sso-login' ?>" class="nav-tab
+                <?php echo ( $tab == 'sso-login' ) ? 'nav-tab-active' : ''; ?>">
+                SSO Login
+            </a>
 
         </h2>
 
@@ -100,6 +104,10 @@ function dt_multisite_network_admin_content(){
             case 'ipstack_keys':
                 $object = new DT_Multisite_Tab_Ipstack_Keys();
                 $object->content();
+                break;
+            case 'sso-login':
+                $object = new DT_Multisite_Tab_SSO_Login();
+                $object->content( 'sso-login' );
                 break;
             case 'movement_maps':
                 $object = new DT_Movement_Maps_Tab_Network_Dashboard();
