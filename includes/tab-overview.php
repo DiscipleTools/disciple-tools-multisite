@@ -133,7 +133,9 @@ class DT_Multisite_Tab_Overview
         if ( ! empty( $sites ) ) {
             foreach ( $sites as $site ) {
                 if ( get_blog_option( $site, 'stylesheet' ) === 'disciple-tools-theme' ) {
-                    $locked = get_blog_option( $site, 'dt_migration_lock', 0 );
+                    switch_to_blog( $site );
+                    $locked = get_transient( 'dt_migration_lock' );
+                    restore_current_blog();
                     if ( !empty( $locked ) ){
                         $list[$site] = [ 'locked' => true ];
                         $list[$site]['url'] = get_blog_option( $site, 'siteurl' );
