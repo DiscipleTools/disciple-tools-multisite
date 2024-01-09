@@ -269,7 +269,12 @@ add_action( 'plugins_loaded', function (){
         }
     }
     //catch plugin update errors and save url that fail
-    add_action('puc_api_error', function ( $result, $url, $slug ){
+    add_action('puc_api_error', function ( $result = null, $url = null, $slug = null ){
+        if ( empty( $result ) || empty( $url ) || empty( $slug ) ){
+            dt_write_log( 'puc_api_error: missing params' );
+            dt_write_log( $result );
+            return;
+        }
         $dont_update = get_option( 'dt_multisite_dont_update_list', [] );
         $slug = strtok( $slug ?: '', '?' );
         $dont_update[$slug] = time();
