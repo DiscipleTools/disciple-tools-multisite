@@ -229,15 +229,13 @@ add_action( 'plugins_loaded', function (){
     if ( !$disable && is_multisite() && ( is_network_admin() || wp_doing_cron() || $is_updating_plugin ) && is_main_site() ){
         // find the Disciple.Tools theme and load the plugin update checker.
         $current_theme = wp_get_theme();
-        if ( $current_theme->get_stylesheet() !== 'disciple-tools-theme' ){
-            foreach ( wp_get_themes() as $theme ){
-                if ( $theme->get( 'TextDomain' ) === 'disciple_tools' && file_exists( $theme->get_stylesheet_directory() . '/dt-core/libraries/plugin-update-checker/plugin-update-checker.php' ) ){
-                    PucFactory::buildUpdateChecker(
-                        'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/disciple-tools-theme-version-control.json',
-                        $theme->get_stylesheet_directory(),
-                        basename( $theme->get_stylesheet_directory() )
-                    );
-                }
+        foreach ( wp_get_themes() as $theme ){
+            if ( $theme->get( 'TextDomain' ) === 'disciple_tools' && file_exists( $theme->get_stylesheet_directory() . '/dt-core/libraries/plugin-update-checker/plugin-update-checker.php' ) ){
+                PucFactory::buildUpdateChecker(
+                    'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-version-control/master/disciple-tools-theme-version-control.json',
+                    $theme->get_stylesheet_directory(),
+                    basename( $theme->get_stylesheet_directory() )
+                );
             }
         }
         if ( !function_exists( 'get_plugins' ) ) {
