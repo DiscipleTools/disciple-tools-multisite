@@ -76,6 +76,10 @@ function dt_multisite_network_admin_content(){
                 <?php echo ( $tab == 'sso-login' ) ? 'nav-tab-active' : ''; ?>">
                 SSO Login
             </a>
+            <a href="<?php echo esc_attr( $link ) . 'cloudflare' ?>" class="nav-tab
+                <?php echo ( $tab == 'cloudflare' ) ? 'nav-tab-active' : ''; ?>">
+                Cloudflare
+            </a>
 
         </h2>
 
@@ -111,6 +115,10 @@ function dt_multisite_network_admin_content(){
                 break;
             case 'movement_maps':
                 $object = new DT_Movement_Maps_Tab_Network_Dashboard();
+                $object->content();
+                break;
+            case 'cloudflare':
+                $object = new DT_Multisite_Tab_Cloudflare();
                 $object->content();
                 break;
 
