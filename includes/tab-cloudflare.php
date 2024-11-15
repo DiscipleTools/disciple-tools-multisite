@@ -50,10 +50,8 @@ class DT_Multisite_Tab_Cloudflare
     }
 
     public function list_keys(){
-        global $wpdb;
-
-        $network_cloudflare_site_key = get_site_option( 'dt_cloudflare_site_key' );
-        $network_cloudflare_secret_key = get_site_option( 'dt_cloudflare_secret_key' );
+        $network_cloudflare_site_key = get_site_option( 'dt_cloudflare_site_key', '' );
+        $network_cloudflare_secret_key = get_site_option( 'dt_cloudflare_secret_key', '' );
 
         ?>
         <!-- Box -->
