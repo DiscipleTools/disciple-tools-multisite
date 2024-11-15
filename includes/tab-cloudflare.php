@@ -24,7 +24,7 @@ class DT_Multisite_Tab_Cloudflare
                     <div id="postbox-container-1" class="postbox-container">
                         <!-- Right Column -->
 
-<!--                        --><?php //$this->bulk_key_add() ?>
+                        <?php $this->documentation() ?>
 
 <!--                        --><?php //$this->default_key() ?>
 
@@ -91,6 +91,24 @@ class DT_Multisite_Tab_Cloudflare
         </table>
         </form>
         <br>
+        <!-- End Box -->
+        <?php
+    }
+
+    public function documentation(){
+        ?>
+        <!-- Box -->
+        <div class="postbox">
+            <h3 class="hndle">Documentation</h3>
+            <div class="inside">
+                <p>
+                    <?php esc_html_e( 'Cloudflare Turnstile is a security feature that helps protect your website from spam and abuse. It is a free service that requires a site key and a secret key.', 'disciple-tools' ) ?>
+                </p>
+                <p>
+                   See <a href="https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/">Turnstile Documentation</a>
+                </p>
+            </div>
+        </div>
         <!-- End Box -->
         <?php
     }
