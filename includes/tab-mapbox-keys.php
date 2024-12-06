@@ -269,7 +269,7 @@ class DT_Multisite_Tab_Mapbox_Keys
                 if ( $site_to_update ){
                     switch_to_blog( $site_to_update );
                     $wpdb->dt_location_grid_meta = $wpdb->prefix . 'dt_location_grid_meta';
-                    $wpdb->dt_location_grid = $wpdb->prefix . 'dt_location_grid';
+                    $wpdb->dt_location_grid = apply_filters( 'dt_location_grid_table', $wpdb->prefix . 'dt_location_grid' );
                     require_once( get_template_directory() . '/dt-mapping/mapping-admin.php' );
                     if ( !method_exists( DT_Mapping_Module_Admin::instance(), 'get_record_count_with_no_location_meta' ) ){
                         ?><tr><td><strong>This feature requires D.T v1.0.2 or later</strong><br><?php
