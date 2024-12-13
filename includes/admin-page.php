@@ -37,10 +37,10 @@ function dt_multisite_network_admin_content(){
             <a href="<?php echo esc_attr( $link ) . 'general' ?>" class="nav-tab
                 <?php echo ( $tab == 'general' || ! isset( $tab ) ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
                 <?php echo esc_attr( 'Overview' ) ?></a>
-            <a href="<?php echo esc_attr( $link ) . 'import' ?>" class="nav-tab
-                <?php echo ( $tab == 'import' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
-                <?php echo esc_attr( 'Import Subsite' ) ?>
-            </a>
+<!--            <a href="--><?php //echo esc_attr( $link ) . 'import' ?><!--" class="nav-tab-->
+<!--                --><?php //echo ( $tab == 'import' ) ? esc_attr( 'nav-tab-active' ) : ''; ?><!--">-->
+<!--                --><?php //echo esc_attr( 'Import Subsite' ) ?>
+<!--            </a>-->
             <a href="<?php echo esc_attr( $link ) . 'mapbox_keys' ?>" class="nav-tab
                 <?php echo ( $tab == 'mapbox_keys' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
                 <?php echo esc_attr( 'Mapbox Keys' ) ?>
@@ -93,10 +93,10 @@ function dt_multisite_network_admin_content(){
                 $object = new DT_Multisite_Tab_Network_Dashboard();
                 $object->content();
                 break;
-            case 'import':
-                $object = new DT_Multisite_Tab_Import_Subsite();
-                $object->content();
-                break;
+//            case 'import':
+//                $object = new DT_Multisite_Tab_Import_Subsite();
+//                $object->content();
+//                break;
             case 'mapbox_keys':
                 $object = new DT_Multisite_Tab_Mapbox_Keys();
                 $object->content();
