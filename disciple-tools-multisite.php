@@ -2,7 +2,7 @@
 /**
  *Plugin Name: Disciple.Tools - Multisite
  * Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
- * Description: Disciple Tools Multisite plugin adds network administration utilities to the multisite network admin area, helpful for managing Disciple Tools multisite installs.
+ * Description: An essential plugin for configuring and managing Disciple.Tools instances on a Multisite from the Network Admin.
  * Version:  1.14.0
  * Author URI: https://github.com/DiscipleTools
  * GitHub Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite

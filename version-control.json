@@ -23,7 +23,7 @@
   },
   "icon": "https://raw.githubusercontent.com/DiscipleTools/disciple-tools-multisite/master/includes/admin/multisite-icon.png",
   "sections": {
-    "description": "Disciple.Tools - Multisite",
+    "description": "An essential plugin for configuring and managing Disciple.Tools instances on a Multisite from the Network Admin.",
     "installation": "(Required) You must have Disciple.Tools Theme installed before using this plugin. Once Disciple.Tools is installed, you can use the normal Plugin system to install the plugin.",
     "changelog": ""
   }
