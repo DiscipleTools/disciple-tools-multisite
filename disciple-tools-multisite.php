@@ -110,6 +110,8 @@ class DT_Multisite {
             require_once( 'includes/add-colum-to-sites-list.php' );
             require_once( 'includes/tab-sso-login.php' );
             require_once( 'includes/tab-cloudflare.php' );
+            require_once( 'includes/tab-ai.php' );
+            require_once( 'includes/tab-storage.php' );
         }
 
         if ( is_admin() || is_network_admin() ) {
