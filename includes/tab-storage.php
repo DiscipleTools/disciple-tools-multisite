@@ -98,7 +98,7 @@ class DT_Multisite_Tab_Storage
                                             $selected = ( $key === ( $dt_storage_connection['type'] ?? '' ) ) ? 'selected' : '';
                                             ?>
                                             <option
-                                                value="<?php echo esc_attr( $key ) ?>" <?php echo $selected; ?>><?php echo esc_attr( $type['label'] ) ?></option>
+                                                value="<?php echo esc_attr( $key ) ?>" <?php echo esc_attr( $selected ); ?>><?php echo esc_attr( $type['label'] ) ?></option>
                                             <?php
                                         }
                                     }
