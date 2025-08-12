@@ -294,3 +294,27 @@ add_action( 'plugins_loaded', function (){
         }
     }
 } );
+
+/**
+ * Add a quick link to the Multisite admin page under the Network Admin menu in the admin bar.
+ */
+add_action( 'admin_bar_menu', function ( $wp_admin_bar ) {
+    if ( ! is_user_logged_in() || ! is_multisite() ) {
+        return;
+    }
+    // Only show to super admins, as the Network Admin menu is only available to them.
+    if ( ! is_super_admin() ) {
+        return;
+    }
+
+    $slug = function_exists( 'dt_multisite_token' ) ? dt_multisite_token() : 'disciple-tools-multisite';
+    $href = network_admin_url( 'admin.php?page=' . $slug );
+
+    $wp_admin_bar->add_node( [
+        'parent' => 'network-admin',
+        'id'     => 'network-admin-dt-multisite',
+        'title'  => 'Disciple.Tools',
+        'href'   => $href,
+        'meta'   => [ 'title' => 'Disciple.Tools Multisite' ],
+    ] );
+}, 100 );
