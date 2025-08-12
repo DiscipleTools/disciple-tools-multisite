@@ -80,6 +80,24 @@ function dt_multisite_network_admin_content(){
                 <?php echo ( $tab == 'cloudflare' ) ? 'nav-tab-active' : ''; ?>">
                 Cloudflare
             </a>
+            <?php
+            if ( isset( $plugins_installed['disciple-tools-ai/disciple-tools-ai.php'] ) || isset( $mu_plugins['disciple-tools-ai/disciple-tools-ai.php'] ) ) {
+                ?>
+                <a href="<?php echo esc_attr( $link ) . 'ai' ?>" class="nav-tab <?php echo ( $tab == 'ai' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
+                    <?php echo esc_attr( 'AI Plugin' ) ?>
+                </a>
+                <?php
+            }
+            ?>
+            <?php
+            if ( isset( $plugins_installed['disciple-tools-storage/disciple-tools-storage.php'] ) || isset( $mu_plugins['disciple-tools-storage/disciple-tools-storage.php'] ) ) {
+                ?>
+                <a href="<?php echo esc_attr( $link ) . 'storage' ?>" class="nav-tab <?php echo ( $tab == 'storage' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
+                    <?php echo esc_attr( 'Storage Plugin' ) ?>
+                </a>
+                <?php
+            }
+            ?>
 
         </h2>
 
@@ -119,6 +137,14 @@ function dt_multisite_network_admin_content(){
                 break;
             case 'cloudflare':
                 $object = new DT_Multisite_Tab_Cloudflare();
+                $object->content();
+                break;
+            case 'ai':
+                $object = new DT_Multisite_Tab_AI();
+                $object->content();
+                break;
+            case 'storage':
+                $object = new DT_Multisite_Tab_Storage();
                 $object->content();
                 break;
 
