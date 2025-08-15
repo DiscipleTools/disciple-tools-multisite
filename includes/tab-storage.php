@@ -60,7 +60,7 @@ class DT_Multisite_Tab_Storage
             }
 
             // Path-style endpoint support (same behavior as theme storage settings)
-            $types = ( class_exists( 'DT_Storage' ) && method_exists( 'DT_Storage', 'list_supported_connection_types' ) ) ? DT_Storage::list_supported_connection_types() : [];
+            $types = ( class_exists( 'Disciple_Tools_Storage' ) && method_exists( 'Disciple_Tools_Storage', 'list_supported_connection_types' ) ) ? Disciple_Tools_Storage::list_supported_connection_types() : [];
             $default_path_style = isset( $types[$type]['default_path_style'] ) ? (bool) $types[$type]['default_path_style'] : ( $type === 'minio' );
             $path_style = isset( $post['path_style'] ) ? (bool) $post['path_style'] : $default_path_style;
 
@@ -104,7 +104,7 @@ class DT_Multisite_Tab_Storage
                             <select style="min-width: 100%;" id="m_main_col_connection_manage_type" name="m_main_col_connection_manage_type">
                                 <option disabled value="">-- select connection type --</option>
                                 <?php
-                                $types = ( class_exists( 'DT_Storage' ) && method_exists( 'DT_Storage', 'list_supported_connection_types' ) ) ? DT_Storage::list_supported_connection_types() : [];
+                                $types = ( class_exists( 'Disciple_Tools_Storage' ) && method_exists( 'Disciple_Tools_Storage', 'list_supported_connection_types' ) ) ? Disciple_Tools_Storage::list_supported_connection_types() : [];
                                 $selected_type = $dt_storage_connection['type'] ?? 'aws';
                                 foreach ( $types as $key => $meta ) {
                                     if ( !empty( $meta['enabled'] ) ) {
@@ -121,7 +121,7 @@ class DT_Multisite_Tab_Storage
                     <tr>
                         <td style="vertical-align: middle;">Path-style endpoint</td>
                         <td>
-                            <?php $types = ( class_exists( 'DT_Storage' ) && method_exists( 'DT_Storage', 'list_supported_connection_types' ) ) ? DT_Storage::list_supported_connection_types() : []; $selected_type = $dt_storage_connection['type'] ?? 'aws'; $default_path_style = isset( $types[$selected_type]['default_path_style'] ) ? (bool) $types[$selected_type]['default_path_style'] : false; $checked = isset( $dt_storage_connection['path_style'] ) ? (bool) $dt_storage_connection['path_style'] : $default_path_style; ?>
+                            <?php $types = ( class_exists( 'Disciple_Tools_Storage' ) && method_exists( 'Disciple_Tools_Storage', 'list_supported_connection_types' ) ) ? Disciple_Tools_Storage::list_supported_connection_types() : []; $selected_type = $dt_storage_connection['type'] ?? 'aws'; $default_path_style = isset( $types[$selected_type]['default_path_style'] ) ? (bool) $types[$selected_type]['default_path_style'] : false; $checked = isset( $dt_storage_connection['path_style'] ) ? (bool) $dt_storage_connection['path_style'] : $default_path_style; ?>
                             <label><input type="checkbox" id="path_style" name="path_style" value="1" <?php echo $checked ? 'checked' : ''; ?> /> Use path-style addressing (required by many MinIO setups)</label>
                         </td>
                     </tr>
