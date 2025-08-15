@@ -89,16 +89,9 @@ function dt_multisite_network_admin_content(){
                 <?php
             }
             ?>
-            <?php
-            if ( isset( $plugins_installed['disciple-tools-storage/disciple-tools-storage.php'] ) || isset( $mu_plugins['disciple-tools-storage/disciple-tools-storage.php'] ) ) {
-                ?>
-                <a href="<?php echo esc_attr( $link ) . 'storage' ?>" class="nav-tab <?php echo ( $tab == 'storage' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
-                    <?php echo esc_attr( 'Storage Plugin' ) ?>
-                </a>
-                <?php
-            }
-            ?>
-
+            <a href="<?php echo esc_attr( $link ) . 'storage' ?>" class="nav-tab <?php echo ( $tab == 'storage' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
+                <?php echo esc_attr( 'Storage' ) ?>
+            </a>
         </h2>
 
         <?php
