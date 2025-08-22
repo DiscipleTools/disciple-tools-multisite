@@ -34,18 +34,16 @@ class DT_Multisite_Tab_Storage
     }
 
     public function process_post() {
-        if ( ! function_exists( 'dt_recursive_sanitize_array' ) ) {
-            function multisite_dt_recursive_sanitize_array( array $array ) : array {
-                foreach ( $array as $key => &$value ) {
-                    if ( is_array( $value ) ) {
-                        $value = multisite_dt_recursive_sanitize_array( $value );
-                    }
-                    else {
-                        $value = sanitize_text_field( wp_unslash( $value ) );
-                    }
+        function multisite_dt_recursive_sanitize_array( array $array ) : array {
+            foreach ( $array as $key => &$value ) {
+                if ( is_array( $value ) ) {
+                    $value = multisite_dt_recursive_sanitize_array( $value );
                 }
-                return $array;
+                else {
+                    $value = sanitize_text_field( wp_unslash( $value ) );
+                }
             }
+            return $array;
         }
         // update
         if ( isset( $_POST['storage_nonce'] )
