@@ -134,7 +134,10 @@ class DT_Multisite_Tab_Storage
                     <tr>
                         <td style="vertical-align: middle;">Path-style endpoint</td>
                         <td>
-                            <?php $types = ( class_exists( 'DT_Storage_API' ) && method_exists( 'DT_Storage_API', 'list_supported_connection_types' ) ) ? DT_Storage_API::list_supported_connection_types() : []; $selected_type = $dt_storage_connection['type'] ?? 'aws'; $default_path_style = isset( $types[$selected_type]['default_path_style'] ) ? (bool) $types[$selected_type]['default_path_style'] : false; $checked = isset( $dt_storage_connection['path_style'] ) ? (bool) $dt_storage_connection['path_style'] : $default_path_style; ?>
+                            <?php $types = ( class_exists( 'DT_Storage_API' ) && method_exists( 'DT_Storage_API', 'list_supported_connection_types' ) ) ? DT_Storage_API::list_supported_connection_types() : [];
+                            $selected_type = $dt_storage_connection['type'] ?? 'aws';
+                            $default_path_style = isset( $types[$selected_type]['default_path_style'] ) ? (bool) $types[$selected_type]['default_path_style'] : false;
+                            $checked = isset( $dt_storage_connection['path_style'] ) ? (bool) $dt_storage_connection['path_style'] : $default_path_style; ?>
                             <label><input type="checkbox" id="path_style" name="path_style" value="1" <?php echo $checked ? 'checked' : ''; ?> /> Use path-style addressing (required by many MinIO setups)</label>
                         </td>
                     </tr>
