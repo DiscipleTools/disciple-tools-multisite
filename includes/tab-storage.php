@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class DT_Multisite_Tab_Storage
 {
     public function content(){
-        $this->process_post();
+        $processed = $this->process_post();
         ?>
         <div class="wrap">
             <div id="poststuff">
@@ -17,7 +17,7 @@ class DT_Multisite_Tab_Storage
                     <div id="post-body-content">
                         <!-- Main Column -->
 
-                        <?php $this->main_column() ?>
+                        <?php $this->main_column( $processed ) ?>
 
                         <!-- End Main Column -->
                     </div><!-- end post-body-content -->
@@ -78,12 +78,30 @@ class DT_Multisite_Tab_Storage
             // Store a single flat connection array, same structure as dt_storage_connection
             $connection = [ 'id' => $id, 'enabled' => $enabled, 'name' => $name, 'type' => ( $type ?: 'aws' ), 'path_style' => $path_style ] + $details;
 
-            update_site_option( 'dt_storage_multisite_connection', $connection );
+            return [
+                'is_update' => true,
+                'updated' => update_site_option( 'dt_storage_multisite_connection', $connection )
+            ];
         }
+
+        return [
+            'is_update' => false,
+            'updated' => false
+        ];
     }
 
-    public function main_column(){
+    public function main_column( $processed ){
         $dt_storage_connection = get_site_option( 'dt_storage_multisite_connection', [] );
+
+        if ( isset( $processed['is_update'], $processed['updated'] ) && $processed['is_update'] ) {
+            ?>
+            <div class="notice <?php echo esc_html( $processed['updated'] ? 'notice-success' : 'notice-error' ) ?>">
+                <p>
+                    <?php echo esc_html( $processed['updated'] ? 'Successfully updated storage settings.' : 'No storage settings update changes made.' ) ?>
+                </p>
+            </div>
+            <?php
+        }
         ?>
         <!-- Box -->
         <form method="post">

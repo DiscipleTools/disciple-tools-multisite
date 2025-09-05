@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class DT_Multisite_Tab_AI
 {
     public function content(){
-        $this->process_post();
+        $processed = $this->process_post();
         ?>
         <div class="wrap">
             <div id="poststuff">
@@ -17,7 +17,7 @@ class DT_Multisite_Tab_AI
                     <div id="post-body-content">
                         <!-- Main Column -->
 
-                        <?php $this->list_keys() ?>
+                        <?php $this->list_keys( $processed ) ?>
 
                         <!-- End Main Column -->
                     </div><!-- end post-body-content -->
@@ -38,17 +38,36 @@ class DT_Multisite_Tab_AI
         if ( isset( $_POST['ai_nonce'] )
             && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ai_nonce'] ) ), 'ai' ) ) {
 
-            update_site_option( 'DT_AI_llm_endpoint', sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_endpoint'] ?? '' ) ) );
-            update_site_option( 'DT_AI_llm_api_key', sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_api_key'] ?? '' ) ) );
-            update_site_option( 'DT_AI_llm_model', sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_model'] ?? '' ) ) );
+            $updated = update_site_option( 'DT_AI_llm_endpoint', sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_endpoint'] ?? '' ) ) ) ||
+                update_site_option( 'DT_AI_llm_api_key', sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_api_key'] ?? '' ) ) ) ||
+                update_site_option( 'DT_AI_llm_model', sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_model'] ?? '' ) ) );
+
+            return [
+                'is_update' => true,
+                'updated' => $updated
+            ];
         }
+
+        return [
+            'is_update' => false,
+            'updated' => false
+        ];
     }
 
-    public function list_keys(){
+    public function list_keys( $processed ){
         $network_ai_llm_endpoint = get_site_option( 'DT_AI_llm_endpoint', '' );
         $network_ai_llm_api_key = get_site_option( 'DT_AI_llm_api_key', '' );
         $network_ai_llm_model = get_site_option( 'DT_AI_llm_model', '' );
 
+        if ( isset( $processed['is_update'], $processed['updated'] ) && $processed['is_update'] ) {
+            ?>
+            <div class="notice <?php echo esc_html( $processed['updated'] ? 'notice-success' : 'notice-error' ) ?>">
+                <p>
+                    <?php echo esc_html( $processed['updated'] ? 'Successfully updated all AI Plugin settings.' : 'No AI Plugin update changes made across any settings.' ) ?>
+                </p>
+            </div>
+            <?php
+        }
         ?>
         <!-- Box -->
         <form method="post">
