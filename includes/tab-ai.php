@@ -38,12 +38,16 @@ class DT_Multisite_Tab_AI
         if ( isset( $_POST['ai_nonce'] )
             && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ai_nonce'] ) ), 'ai' ) ) {
 
-            update_site_option( 'DT_AI_llm_endpoint', sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_endpoint'] ?? '' ) ) );
-            update_site_option( 'DT_AI_llm_api_key', sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_api_key'] ?? '' ) ) );
-            update_site_option( 'DT_AI_llm_model', sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_model'] ?? '' ) ) );
-            update_site_option( 'DT_AI_transcript_llm_endpoint', sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_endpoint'] ?? '' ) ) );
-            update_site_option( 'DT_AI_transcript_llm_api_key', sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_api_key'] ?? '' ) ) );
-            update_site_option( 'DT_AI_transcript_llm_model', sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_model'] ?? '' ) ) );
+            $settings = [
+                'llm_endpoint' => sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_endpoint'] ?? '' ) ),
+                'llm_api_key' => sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_api_key'] ?? '' ) ),
+                'llm_model' => sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_model'] ?? '' ) ),
+                'transcript_llm_endpoint' => sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_endpoint'] ?? '' ) ),
+                'transcript_llm_api_key' => sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_api_key'] ?? '' ) ),
+                'transcript_llm_model' => sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_model'] ?? '' ) )
+            ];
+
+            update_site_option( 'DT_AI_connection_settings', $settings );
 
             return [
                 'is_update' => true,
@@ -58,13 +62,14 @@ class DT_Multisite_Tab_AI
     }
 
     public function list_keys( $processed ){
-        $network_ai_llm_endpoint = get_site_option( 'DT_AI_llm_endpoint', '' );
-        $network_ai_llm_api_key = get_site_option( 'DT_AI_llm_api_key', '' );
-        $network_ai_llm_model = get_site_option( 'DT_AI_llm_model', '' );
-
-        $network_ai_transcript_llm_endpoint = get_site_option( 'DT_AI_transcript_llm_endpoint', '' );
-        $network_ai_transcript_llm_api_key = get_site_option( 'DT_AI_transcript_llm_api_key', '' );
-        $network_ai_transcript_llm_model = get_site_option( 'DT_AI_transcript_llm_model', '' );
+        $network_settings = get_site_option( 'DT_AI_connection_settings', [
+            'llm_endpoint' => '',
+            'llm_api_key' => '',
+            'llm_model' => '',
+            'transcript_llm_endpoint' => '',
+            'transcript_llm_api_key' => '',
+            'transcript_llm_model' => ''
+        ] );
 
         if ( isset( $processed['is_update'], $processed['updated'] ) && $processed['is_update'] ) {
             ?>
@@ -91,7 +96,7 @@ class DT_Multisite_Tab_AI
                             Endpoint
                         </td>
                         <td>
-                            <input type="text" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_ai_llm_endpoint ) ?>" name="dt_ai_llm_endpoint" placeholder="Add Chat LLM Endpoint" />
+                            <input type="text" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_settings['llm_endpoint'] ) ?>" name="dt_ai_llm_endpoint" placeholder="Add Chat LLM Endpoint" />
                         </td>
                     </tr>
                     <tr>
@@ -99,7 +104,7 @@ class DT_Multisite_Tab_AI
                             API Key
                         </td>
                         <td>
-                            <input type="password" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_ai_llm_api_key ) ?>" name="dt_ai_llm_api_key" placeholder="Add Chat LLM API Key" />
+                            <input type="password" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_settings['llm_api_key'] ) ?>" name="dt_ai_llm_api_key" placeholder="Add Chat LLM API Key" />
                         </td>
                     </tr>
                     <tr>
@@ -107,7 +112,7 @@ class DT_Multisite_Tab_AI
                             Model
                         </td>
                         <td>
-                            <input type="text" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_ai_llm_model ) ?>" name="dt_ai_llm_model" placeholder="Add Chat LLM Model" />
+                            <input type="text" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_settings['llm_model'] ) ?>" name="dt_ai_llm_model" placeholder="Add Chat LLM Model" />
                         </td>
                     </tr>
                     <tr>
@@ -132,7 +137,7 @@ class DT_Multisite_Tab_AI
                         Endpoint
                     </td>
                     <td>
-                        <input type="text" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_ai_transcript_llm_endpoint ) ?>" name="dt_ai_transcript_llm_endpoint" placeholder="Add Transcript LLM Endpoint" />
+                        <input type="text" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_settings['transcript_llm_endpoint'] ) ?>" name="dt_ai_transcript_llm_endpoint" placeholder="Add Transcript LLM Endpoint" />
                     </td>
                 </tr>
                 <tr>
@@ -140,7 +145,7 @@ class DT_Multisite_Tab_AI
                         API Key
                     </td>
                     <td>
-                        <input type="password" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_ai_transcript_llm_api_key ) ?>" name="dt_ai_transcript_llm_api_key" placeholder="Add Transcript LLM API Key" />
+                        <input type="password" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_settings['transcript_llm_api_key'] ) ?>" name="dt_ai_transcript_llm_api_key" placeholder="Add Transcript LLM API Key" />
                     </td>
                 </tr>
                 <tr>
@@ -148,7 +153,7 @@ class DT_Multisite_Tab_AI
                         Model
                     </td>
                     <td>
-                        <input type="text" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_ai_transcript_llm_model ) ?>" name="dt_ai_transcript_llm_model" placeholder="Add Transcript LLM Model" />
+                        <input type="text" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_settings['transcript_llm_model'] ) ?>" name="dt_ai_transcript_llm_model" placeholder="Add Transcript LLM Model" />
                     </td>
                 </tr>
                 <tr>
