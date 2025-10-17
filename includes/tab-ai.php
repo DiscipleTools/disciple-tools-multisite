@@ -118,7 +118,7 @@ class DT_Multisite_Tab_AI
 
                                     // Exclude providers with no valid paths.
                                     if ( !empty( $provider['paths']['chat'] ) ) {
-                                        $selected = ($selected_ai_provider == $provider_key) ? 'selected="selected"' : '';
+                                        $selected = ( $selected_ai_provider == $provider_key ) ? 'selected="selected"' : '';
                                         ?>
                                         <option value="<?php echo esc_attr( $provider_key ) ?>" <?php echo esc_attr( $selected ) ?>><?php echo esc_attr( $provider['label'] ) ?></option>
                                         <?php
@@ -138,7 +138,7 @@ class DT_Multisite_Tab_AI
                             <select id="dt_ai_llm_provider_chat_paths" name="dt_ai_llm_provider_chat_paths" style="width:48%; vertical-align: top;">
                                 <?php
                                 foreach ( $ai_providers[ $selected_ai_provider ]['paths']['chat'] as $path_key => $path ) {
-                                    $selected = ($selected_ai_provider_chat_path == $path_key) ? 'selected="selected"' : '';
+                                    $selected = ( $selected_ai_provider_chat_path == $path_key ) ? 'selected="selected"' : '';
                                     ?>
                                     <option value="<?php echo esc_attr( $path_key ) ?>" <?php echo esc_attr( $selected ) ?>><?php echo esc_attr( $path ) ?></option>
                                     <?php
@@ -191,7 +191,7 @@ class DT_Multisite_Tab_AI
 
                                 // Exclude providers with no valid paths.
                                 if ( !empty( $provider['paths']['transcript'] ) ) {
-                                    $selected = ($selected_ai_transcript_provider == $provider_key) ? 'selected="selected"' : '';
+                                    $selected = ( $selected_ai_transcript_provider == $provider_key ) ? 'selected="selected"' : '';
                                     ?>
                                     <option value="<?php echo esc_attr( $provider_key ) ?>" <?php echo esc_attr( $selected ) ?>><?php echo esc_attr( $provider['label'] ) ?></option>
                                     <?php
@@ -211,7 +211,7 @@ class DT_Multisite_Tab_AI
                         <select id="dt_ai_transcript_llm_provider_transcript_paths" name="dt_ai_transcript_llm_provider_transcript_paths" style="width:48%; vertical-align: top;">
                             <?php
                             foreach ( $ai_providers[ $selected_ai_transcript_provider ]['paths']['transcript'] as $path_key => $path ) {
-                                $selected = ($selected_ai_transcript_provider_chat_path == $path_key) ? 'selected="selected"' : '';
+                                $selected = ( $selected_ai_transcript_provider_chat_path == $path_key ) ? 'selected="selected"' : '';
                                 ?>
                                 <option value="<?php echo esc_attr( $path_key ) ?>" <?php echo esc_attr( $selected ) ?>><?php echo esc_attr( $path ) ?></option>
                                 <?php
