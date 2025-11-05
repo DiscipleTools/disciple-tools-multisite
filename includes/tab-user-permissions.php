@@ -11,12 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class DT_Multisite_Tab_User_Permissions {
 
     public function content() {
-        // Handle form submission
-        if ( isset( $_POST['dt_multisite_user_permissions_nonce'] )
-             && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['dt_multisite_user_permissions_nonce'] ) ), 'dt_multisite_user_permissions' ) ) {
-            $this->process_form();
-        }
-
+        $this->process_post();
         ?>
         <div class="wrap">
             <div id="poststuff">
@@ -41,19 +36,24 @@ class DT_Multisite_Tab_User_Permissions {
         <?php
     }
 
-    private function process_form() {
-        if ( ! is_super_admin() ) {
-            wp_die( 'You do not have sufficient permissions to access this page.' );
+    public function process_post() {
+        // Handle form submission
+        if ( isset( $_POST['dt_multisite_user_permissions_nonce'] )
+             && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['dt_multisite_user_permissions_nonce'] ) ), 'dt_multisite_user_permissions' ) ) {
+
+            if ( ! is_super_admin() ) {
+                wp_die( 'You do not have sufficient permissions to access this page.' );
+            }
+
+            $allow_subsite_admins_edit_users = isset( $_POST['dt_allow_subsite_admins_edit_users'] ) ? 1 : 0;
+            update_site_option( 'dt_allow_subsite_admins_edit_users', $allow_subsite_admins_edit_users );
+
+            ?>
+            <div class="notice notice-success is-dismissible">
+                <p><?php esc_html_e( 'Settings saved successfully.', 'disciple-tools-multisite' ); ?></p>
+            </div>
+            <?php
         }
-
-        $allow_subsite_admins_edit_users = isset( $_POST['dt_allow_subsite_admins_edit_users'] ) ? 1 : 0;
-        update_site_option( 'dt_allow_subsite_admins_edit_users', $allow_subsite_admins_edit_users );
-
-        ?>
-        <div class="notice notice-success is-dismissible">
-            <p><?php esc_html_e( 'Settings saved successfully.', 'disciple-tools-multisite' ); ?></p>
-        </div>
-        <?php
     }
 
     private function user_permissions_settings() {
