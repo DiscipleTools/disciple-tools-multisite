@@ -112,6 +112,7 @@ class DT_Multisite {
             require_once( 'includes/tab-cloudflare.php' );
             require_once( 'includes/tab-ai.php' );
             require_once( 'includes/tab-storage.php' );
+            require_once( 'includes/tab-user-permissions.php' );
         }
 
         if ( is_admin() || is_network_admin() ) {
