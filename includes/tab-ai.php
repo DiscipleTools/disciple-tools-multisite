@@ -34,14 +34,17 @@ class DT_Multisite_Tab_AI
     }
 
     public function process_post() {
-        // Process Chat Model Form
+        // Verify nonces
         $ai_chat_nonce_verified = isset( $_POST['ai_chat_nonce'] )
             && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ai_chat_nonce'] ) ), 'ai_chat' );
 
         $ai_transcript_nonce_verified = isset( $_POST['ai_transcript_nonce'] )
             && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ai_transcript_nonce'] ) ), 'ai_transcript' );
 
-        if ( !$ai_chat_nonce_verified && !$ai_transcript_nonce_verified ) {
+        $ai_features_nonce_verified = isset( $_POST['ai_features_nonce'] )
+            && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ai_features_nonce'] ) ), 'ai_features' );
+
+        if ( !$ai_chat_nonce_verified && !$ai_transcript_nonce_verified && !$ai_features_nonce_verified ) {
             return [
                 'is_update' => false,
                 'updated' => false
@@ -90,6 +93,28 @@ class DT_Multisite_Tab_AI
             $updated_settings['transcript_llm_model'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_model'] ?? '' ) );
 
             update_site_option( 'DT_AI_connection_settings', $updated_settings );
+
+            return [
+                'is_update' => true,
+                'updated' => true
+            ];
+        }
+
+        // Process Enabled Features Form
+        if ( $ai_features_nonce_verified ) {
+            $post_vars = dt_recursive_sanitize_array( $_POST );
+
+            // Get all modules
+            $modules = Disciple_Tools_AI_API::list_modules();
+
+            // Build network module states array
+            $network_module_states = [];
+            foreach ( $modules as $module ) {
+                $network_module_states[ $module['id'] ] = isset( $post_vars[ $module['id'] ] ) ? 1 : 0;
+            }
+
+            // Save network-level module states
+            update_site_option( 'DT_AI_network_modules', $network_module_states );
 
             return [
                 'is_update' => true,
@@ -296,6 +321,55 @@ class DT_Multisite_Tab_AI
                     <td colspan="2" style="width:10%;">
                         <span style="float:right;">
                             <button class="button btn" type="submit">Save Transcription Model</button>
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+        <br>
+
+        <!-- Enabled Features Form -->
+        <form method="post" id="features-form">
+            <?php wp_nonce_field( 'ai_features', 'ai_features_nonce' ) ?>
+            <table class="widefat striped">
+                <thead>
+                <tr>
+                    <th colspan="2"><span style="font-weight: bold;">Network Default Enabled Features</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php
+                $modules = Disciple_Tools_AI_API::list_modules();
+
+                // Get network-level module states
+                $network_module_states = get_site_option( 'DT_AI_network_modules', [] );
+
+                foreach ( $modules as $module ) {
+                    if ( isset( $module['visible'] ) && $module['visible'] ) {
+                        // Check network state, default to the module's default enabled state if not set
+                        $network_enabled = isset( $network_module_states[ $module['id'] ] )
+                            ? $network_module_states[ $module['id'] ]
+                            : ( isset( $module['enabled'] ) ? $module['enabled'] : 0 );
+                        ?>
+                        <tr>
+                            <td>
+                                <?php echo esc_attr( $module['name'] ) ?>
+                                <br>
+                                <small><?php echo esc_attr( $module['description'] ) ?></small>
+                            </td>
+                            <td>
+                                <input type="checkbox" name="<?php echo esc_attr( $module['id'] ) ?>" <?php echo ( $network_enabled ? 'checked' : '' ) ?>>
+                            </td>
+                        </tr>
+                        <?php
+                    }
+                }
+                ?>
+                <tr>
+                    <td colspan="2">
+                        <span style="float:right;">
+                            <button class="button btn" type="submit">Save Enabled Features</button>
                         </span>
                     </td>
                 </tr>
