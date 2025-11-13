@@ -34,24 +34,44 @@ class DT_Multisite_Tab_AI
     }
 
     public function process_post() {
-        // update
-        if ( isset( $_POST['ai_nonce'] )
-            && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ai_nonce'] ) ), 'ai' ) ) {
+        // Process Chat Model Form
+        $ai_chat_nonce_verified = isset( $_POST['ai_chat_nonce'] )
+            && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ai_chat_nonce'] ) ), 'ai_chat' );
 
-            $settings = [
-                'llm_provider' => sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_providers'] ?? 'predictionguard' ) ),
-                'llm_provider_chat_path' => sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_provider_chat_paths'] ?? 'chat_complete' ) ),
-                'llm_endpoint' => sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_endpoint'] ?? '' ) ),
-                'llm_api_key' => sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_api_key'] ?? '' ) ),
-                'llm_model' => sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_model'] ?? '' ) ),
-                'transcript_llm_provider' => sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_providers'] ?? 'predictionguard' ) ),
-                'transcript_llm_provider_transcript_path' => sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_provider_transcript_paths'] ?? 'audio_transcript' ) ),
-                'transcript_llm_endpoint' => sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_endpoint'] ?? '' ) ),
-                'transcript_llm_api_key' => sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_api_key'] ?? '' ) ),
-                'transcript_llm_model' => sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_model'] ?? '' ) )
+        $ai_transcript_nonce_verified = isset( $_POST['ai_transcript_nonce'] )
+            && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ai_transcript_nonce'] ) ), 'ai_transcript' );
+
+        if ( !$ai_chat_nonce_verified && !$ai_transcript_nonce_verified ) {
+            return [
+                'is_update' => false,
+                'updated' => false
             ];
+        }
+        // Get current settings fresh from database
+        $current_settings = get_site_option( 'DT_AI_connection_settings', [
+            'llm_provider' => '',
+            'llm_provider_chat_path' => '',
+            'llm_endpoint' => '',
+            'llm_api_key' => '',
+            'llm_model' => '',
+            'transcript_llm_provider' => '',
+            'transcript_llm_provider_transcript_path' => '',
+            'transcript_llm_endpoint' => '',
+            'transcript_llm_api_key' => '',
+            'transcript_llm_model' => ''
+        ] );
 
-            update_site_option( 'DT_AI_connection_settings', $settings );
+        if ( $ai_chat_nonce_verified ) {
+
+
+            $updated_settings = $current_settings;
+            $updated_settings['llm_provider'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_providers'] ?? '' ) );
+            $updated_settings['llm_provider_chat_path'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_provider_chat_paths'] ?? '' ) );
+            $updated_settings['llm_endpoint'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_endpoint'] ?? '' ) );
+            $updated_settings['llm_api_key'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_api_key'] ?? '' ) );
+            $updated_settings['llm_model'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_model'] ?? '' ) );
+
+            update_site_option( 'DT_AI_connection_settings', $updated_settings );
 
             return [
                 'is_update' => true,
@@ -59,21 +79,36 @@ class DT_Multisite_Tab_AI
             ];
         }
 
-        return [
-            'is_update' => false,
-            'updated' => false
-        ];
+        // Process Transcription Model Form
+        if ( $ai_transcript_nonce_verified ) {
+
+            $updated_settings = $current_settings;
+            $updated_settings['transcript_llm_provider'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_providers'] ?? '' ) );
+            $updated_settings['transcript_llm_provider_transcript_path'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_provider_transcript_paths'] ?? '' ) );
+            $updated_settings['transcript_llm_endpoint'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_endpoint'] ?? '' ) );
+            $updated_settings['transcript_llm_api_key'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_api_key'] ?? '' ) );
+            $updated_settings['transcript_llm_model'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_model'] ?? '' ) );
+
+            update_site_option( 'DT_AI_connection_settings', $updated_settings );
+
+            return [
+                'is_update' => true,
+                'updated' => true
+            ];
+        }
+
+        return false;
     }
 
     public function list_keys( $processed ){
         $network_settings = get_site_option( 'DT_AI_connection_settings', [
-            'llm_provider' => 'predictionguard',
-            'llm_provider_chat_path' => 'chat_complete',
+            'llm_provider' => '',
+            'llm_provider_chat_path' => '',
             'llm_endpoint' => '',
             'llm_api_key' => '',
             'llm_model' => '',
-            'transcript_llm_provider' => 'predictionguard',
-            'transcript_llm_provider_transcript_path' => 'audio_transcript',
+            'transcript_llm_provider' => '',
+            'transcript_llm_provider_transcript_path' => '',
             'transcript_llm_endpoint' => '',
             'transcript_llm_api_key' => '',
             'transcript_llm_model' => ''
@@ -81,11 +116,11 @@ class DT_Multisite_Tab_AI
 
         $ai_providers = apply_filters( 'dt_ai_providers', [] );
 
-        $selected_ai_provider = $network_settings['llm_provider'] ?? 'predictionguard';
-        $selected_ai_provider_chat_path = $network_settings['llm_provider_chat_path'] ?? 'chat_complete';
+        $selected_ai_provider = $network_settings['llm_provider'] ?? '';
+        $selected_ai_provider_chat_path = $network_settings['llm_provider_chat_path'] ?? '';
 
-        $selected_ai_transcript_provider = $network_settings['transcript_llm_provider'] ?? 'predictionguard';
-        $selected_ai_transcript_provider_chat_path = $network_settings['transcript_llm_provider_transcript_path'] ?? 'audio_transcript';
+        $selected_ai_transcript_provider = $network_settings['transcript_llm_provider'] ?? '';
+        $selected_ai_transcript_provider_chat_path = $network_settings['transcript_llm_provider_transcript_path'] ?? '';
 
         if ( isset( $processed['is_update'], $processed['updated'] ) && $processed['is_update'] ) {
             ?>
@@ -97,9 +132,9 @@ class DT_Multisite_Tab_AI
             <?php
         }
         ?>
-        <!-- Box -->
-        <form method="post">
-            <?php wp_nonce_field( 'ai', 'ai_nonce' ) ?>
+        <!-- Chat Model Form -->
+        <form method="post" id="chat-model-form">
+            <?php wp_nonce_field( 'ai_chat', 'ai_chat_nonce' ) ?>
             <table class="widefat striped">
                 <thead>
                 <tr>
@@ -112,13 +147,16 @@ class DT_Multisite_Tab_AI
                             Provider
                         </td>
                         <td>
-                            <select id="dt_ai_llm_providers" name="dt_ai_llm_providers" style="width:50%; vertical-align: top;">
+                            <select id="dt_ai_llm_providers" name="dt_ai_llm_providers" style="width:50%; vertical-align: top;" required>
+                                <?php if ( empty( $selected_ai_provider ) ) : ?>
+                                    <option value="" disabled selected>--- Please Select Option ---</option>
+                                <?php endif; ?>
                                 <?php
                                 foreach ( $ai_providers as $provider_key => $provider ) {
 
                                     // Exclude providers with no valid paths.
                                     if ( !empty( $provider['paths']['chat'] ) ) {
-                                        $selected = ( $selected_ai_provider == $provider_key ) ? 'selected="selected"' : '';
+                                        $selected = ( !empty( $selected_ai_provider ) && $selected_ai_provider == $provider_key ) ? 'selected="selected"' : '';
                                         ?>
                                         <option value="<?php echo esc_attr( $provider_key ) ?>" <?php echo esc_attr( $selected ) ?>><?php echo esc_attr( $provider['label'] ) ?></option>
                                         <?php
@@ -135,13 +173,18 @@ class DT_Multisite_Tab_AI
                         <td>
                             <input type="text" class="regular-text" style="width:50%; vertical-align: top;" value="<?php echo esc_attr( $network_settings['llm_endpoint'] ) ?>" id="dt_ai_llm_endpoint" name="dt_ai_llm_endpoint" placeholder="Add Chat LLM Endpoint" />
 
-                            <select id="dt_ai_llm_provider_chat_paths" name="dt_ai_llm_provider_chat_paths" style="width:48%; vertical-align: top;">
+                            <select id="dt_ai_llm_provider_chat_paths" name="dt_ai_llm_provider_chat_paths" style="width:48%; vertical-align: top;" required>
+                                <?php if ( empty( $selected_ai_provider_chat_path ) ) : ?>
+                                    <option value="" disabled selected>--- Please Select Option ---</option>
+                                <?php endif; ?>
                                 <?php
-                                foreach ( $ai_providers[ $selected_ai_provider ]['paths']['chat'] as $path_key => $path ) {
-                                    $selected = ( $selected_ai_provider_chat_path == $path_key ) ? 'selected="selected"' : '';
-                                    ?>
-                                    <option value="<?php echo esc_attr( $path_key ) ?>" <?php echo esc_attr( $selected ) ?>><?php echo esc_attr( $path ) ?></option>
-                                    <?php
+                                if ( !empty( $selected_ai_provider ) && isset( $ai_providers[ $selected_ai_provider ]['paths']['chat'] ) ) {
+                                    foreach ( $ai_providers[ $selected_ai_provider ]['paths']['chat'] as $path_key => $path ) {
+                                        $selected = ( !empty( $selected_ai_provider_chat_path ) && $selected_ai_provider_chat_path == $path_key ) ? 'selected="selected"' : '';
+                                        ?>
+                                        <option value="<?php echo esc_attr( $path_key ) ?>" <?php echo esc_attr( $selected ) ?>><?php echo esc_attr( $path ) ?></option>
+                                        <?php
+                                    }
                                 }
                                 ?>
                             </select>
@@ -166,13 +209,18 @@ class DT_Multisite_Tab_AI
                     <tr>
                         <td colspan="2" style="width:10%;">
                         <span style="float:right;">
-                            <button class="button btn" type="submit">Update</button>
+                            <button class="button btn" type="submit">Save Chat Model</button>
                         </span>
                         </td>
                     </tr>
                 </tbody>
             </table>
-            <br>
+        </form>
+        <br>
+
+        <!-- Transcription Model Form -->
+        <form method="post" id="transcript-model-form">
+            <?php wp_nonce_field( 'ai_transcript', 'ai_transcript_nonce' ) ?>
             <table class="widefat striped">
                 <thead>
                 <tr>
@@ -185,13 +233,16 @@ class DT_Multisite_Tab_AI
                         Provider
                     </td>
                     <td>
-                        <select id="dt_ai_transcript_llm_providers" name="dt_ai_transcript_llm_providers" style="width:50%; vertical-align: top;">
+                        <select id="dt_ai_transcript_llm_providers" name="dt_ai_transcript_llm_providers" style="width:50%; vertical-align: top;" required>
+                            <?php if ( empty( $selected_ai_transcript_provider ) ) : ?>
+                                <option value="" disabled selected>--- Please Select Option ---</option>
+                            <?php endif; ?>
                             <?php
                             foreach ( $ai_providers as $provider_key => $provider ) {
 
                                 // Exclude providers with no valid paths.
                                 if ( !empty( $provider['paths']['transcript'] ) ) {
-                                    $selected = ( $selected_ai_transcript_provider == $provider_key ) ? 'selected="selected"' : '';
+                                    $selected = ( !empty( $selected_ai_transcript_provider ) && $selected_ai_transcript_provider == $provider_key ) ? 'selected="selected"' : '';
                                     ?>
                                     <option value="<?php echo esc_attr( $provider_key ) ?>" <?php echo esc_attr( $selected ) ?>><?php echo esc_attr( $provider['label'] ) ?></option>
                                     <?php
@@ -208,13 +259,18 @@ class DT_Multisite_Tab_AI
                     <td>
                         <input type="text" class="regular-text" style="width:50%; vertical-align: top;" value="<?php echo esc_attr( $network_settings['transcript_llm_endpoint'] ) ?>" id="dt_ai_transcript_llm_endpoint" name="dt_ai_transcript_llm_endpoint" placeholder="Add Transcript LLM Endpoint" />
 
-                        <select id="dt_ai_transcript_llm_provider_transcript_paths" name="dt_ai_transcript_llm_provider_transcript_paths" style="width:48%; vertical-align: top;">
+                        <select id="dt_ai_transcript_llm_provider_transcript_paths" name="dt_ai_transcript_llm_provider_transcript_paths" style="width:48%; vertical-align: top;" required>
+                            <?php if ( empty( $selected_ai_transcript_provider_chat_path ) ) : ?>
+                                <option value="" disabled selected>--- Please Select Option ---</option>
+                            <?php endif; ?>
                             <?php
-                            foreach ( $ai_providers[ $selected_ai_transcript_provider ]['paths']['transcript'] as $path_key => $path ) {
-                                $selected = ( $selected_ai_transcript_provider_chat_path == $path_key ) ? 'selected="selected"' : '';
-                                ?>
-                                <option value="<?php echo esc_attr( $path_key ) ?>" <?php echo esc_attr( $selected ) ?>><?php echo esc_attr( $path ) ?></option>
-                                <?php
+                            if ( !empty( $selected_ai_transcript_provider ) && isset( $ai_providers[ $selected_ai_transcript_provider ]['paths']['transcript'] ) ) {
+                                foreach ( $ai_providers[ $selected_ai_transcript_provider ]['paths']['transcript'] as $path_key => $path ) {
+                                    $selected = ( !empty( $selected_ai_transcript_provider_chat_path ) && $selected_ai_transcript_provider_chat_path == $path_key ) ? 'selected="selected"' : '';
+                                    ?>
+                                    <option value="<?php echo esc_attr( $path_key ) ?>" <?php echo esc_attr( $selected ) ?>><?php echo esc_attr( $path ) ?></option>
+                                    <?php
+                                }
                             }
                             ?>
                         </select>
@@ -239,7 +295,7 @@ class DT_Multisite_Tab_AI
                 <tr>
                     <td colspan="2" style="width:10%;">
                         <span style="float:right;">
-                            <button class="button btn" type="submit">Update</button>
+                            <button class="button btn" type="submit">Save Transcription Model</button>
                         </span>
                     </td>
                 </tr>
@@ -291,6 +347,24 @@ class DT_Multisite_Tab_AI
                         if ( aiProvider?.models?.chat && aiProvider.models.chat.length > 0 ) {
                             chatModel.val( aiProvider.models.chat[0] );
                         }
+
+                    } else if ( !selectedProvider ) {
+
+                        // Clear existing options
+                        chatPathsSelect.empty();
+
+                        // Add placeholder option
+                        chatPathsSelect.append(
+                            jQuery('<option></option>')
+                            .attr('value', '')
+                            .attr('disabled', 'disabled')
+                            .attr('selected', 'selected')
+                            .text('--- Please Select Option ---')
+                        );
+
+                        // Clear remaining fields
+                        chatEndpoint.val('');
+                        chatModel.val('');
                     }
                 }
 
@@ -339,6 +413,24 @@ class DT_Multisite_Tab_AI
                         if ( aiProvider?.models?.transcript && aiProvider.models.transcript.length > 0 ) {
                             transcriptModel.val( aiProvider.models.transcript[0] );
                         }
+
+                    } else if ( !selectedProvider ) {
+
+                        // Clear existing options
+                        transcriptPathsSelect.empty();
+
+                        // Add placeholder option
+                        transcriptPathsSelect.append(
+                            jQuery('<option></option>')
+                            .attr('value', '')
+                            .attr('disabled', 'disabled')
+                            .attr('selected', 'selected')
+                            .text('--- Please Select Option ---')
+                        );
+
+                        // Clear remaining fields
+                        transcriptEndpoint.val('');
+                        transcriptModel.val('');
                     }
                 }
 
