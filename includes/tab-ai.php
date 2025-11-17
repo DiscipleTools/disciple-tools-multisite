@@ -104,8 +104,16 @@ class DT_Multisite_Tab_AI
         if ( $ai_features_nonce_verified ) {
             $post_vars = dt_recursive_sanitize_array( $_POST );
 
+            // Check if AI plugin is available
+            if ( !class_exists( 'DT_AI_Network_API' ) ) {
+                return [
+                    'is_update' => false,
+                    'updated' => false
+                ];
+            }
+
             // Get all modules
-            $modules = Disciple_Tools_AI_API::list_modules();
+            $modules = DT_AI_Network_API::list_modules();
 
             // Build network module states array
             $network_module_states = [];
@@ -340,12 +348,26 @@ class DT_Multisite_Tab_AI
                 </thead>
                 <tbody>
                 <?php
-                $modules = Disciple_Tools_AI_API::list_modules();
+                // Check if AI plugin is available
+                if ( !class_exists( 'DT_AI_Network_API' ) ) {
+                    ?>
+                    <tr>
+                        <td colspan="2">
+                            <div class="notice notice-warning inline">
+                                <p>
+                                    <strong>AI Plugin Not Available:</strong> The Disciple.Tools AI plugin must be network activated to configure AI features.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php
+                } else {
+                    $modules = DT_AI_Network_API::list_modules();
 
-                // Get network-level module states
-                $network_module_states = get_site_option( 'DT_AI_network_modules', [] );
+                    // Get network-level module states
+                    $network_module_states = get_site_option( 'DT_AI_network_modules', [] );
 
-                foreach ( $modules as $module ) {
+                    foreach ( $modules as $module ) {
                     if ( isset( $module['visible'] ) && $module['visible'] ) {
                         // Check network state, default to the module's default enabled state if not set
                         $network_enabled = isset( $network_module_states[ $module['id'] ] )
@@ -365,6 +387,7 @@ class DT_Multisite_Tab_AI
                         <?php
                     }
                 }
+                } // End else (AI plugin available check)
                 ?>
                 <tr>
                     <td colspan="2">
