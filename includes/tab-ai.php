@@ -147,7 +147,8 @@ class DT_Multisite_Tab_AI
             'transcript_llm_model' => ''
         ] );
 
-        $ai_providers = apply_filters( 'dt_ai_providers', [] );
+        // Use network API to get providers (works even without DT theme)
+        $ai_providers = class_exists( 'DT_AI_Network_API' ) ? DT_AI_Network_API::get_ai_providers() : [];
 
         $selected_ai_provider = $network_settings['llm_provider'] ?? '';
         $selected_ai_provider_chat_path = $network_settings['llm_provider_chat_path'] ?? '';
