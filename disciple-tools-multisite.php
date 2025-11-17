@@ -320,3 +320,22 @@ add_action( 'admin_bar_menu', function ( $wp_admin_bar ) {
         'meta'   => [ 'title' => 'Disciple.Tools Multisite' ],
     ] );
 }, 100 );
+
+
+/**
+ * Fallback function for dt_recursive_sanitize_array
+ * This is needed when the DT theme is not active (e.g., in Network Admin)
+ */
+if ( ! function_exists( 'dt_recursive_sanitize_array' ) ) {
+    function dt_recursive_sanitize_array( array $array ) : array {
+        foreach ( $array as $key => &$value ) {
+            if ( is_array( $value ) ) {
+                $value = dt_recursive_sanitize_array( $value );
+            }
+            else {
+                $value = sanitize_text_field( wp_unslash( $value ) );
+            }
+        }
+        return $array;
+    }
+}
