@@ -3,7 +3,7 @@
  *Plugin Name: Disciple.Tools - Multisite
  * Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Description: An essential plugin for configuring and managing Disciple.Tools instances on a Multisite from the Network Admin.
- * Version:  1.16.4
+ * Version:  1.16.5
  * Author URI: https://github.com/DiscipleTools
  * GitHub Plugin URI: https://github.com/DiscipleTools/disciple-tools-multisite
  * Requires at least: 4.7.0
@@ -228,8 +228,9 @@ require( 'includes/admin/plugin-update-checker/plugin-update-checker.php' );
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 add_action( 'plugins_loaded', function (){
     $is_updating_plugin = isset( $_POST['action'] ) && $_POST['action'] === 'update-plugin'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+    $is_updating_theme = isset( $_POST['action'] ) && $_POST['action'] === 'update-theme'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
     $disable = isset( $_POST['wppusher'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-    if ( !$disable && is_multisite() && ( is_network_admin() || wp_doing_cron() || $is_updating_plugin ) && is_main_site() ){
+    if ( !$disable && is_multisite() && ( is_network_admin() || wp_doing_cron() || $is_updating_plugin || $is_updating_theme ) && is_main_site() ){
         // find the Disciple.Tools theme and load the plugin update checker.
         $current_theme = wp_get_theme();
         foreach ( wp_get_themes() as $theme ){
