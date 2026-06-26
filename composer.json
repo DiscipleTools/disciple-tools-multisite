@@ -3,6 +3,9 @@
         "dealerdirect/phpcodesniffer-composer-installer": "*",
         "wp-coding-standards/wpcs": "*"
     },
+    "scripts": {
+        "lint": "./test/test_phpcs.sh"
+    },
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true

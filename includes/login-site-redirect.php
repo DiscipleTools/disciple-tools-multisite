@@ -310,7 +310,7 @@ class DT_Multisite_Login_Site_Redirect {
                 $description = get_blog_option( $site->userblog_id, 'blogdescription' );
                 $logo_url    = $this->get_site_logo_url( $site->userblog_id );
                 $display_url = preg_replace( '#^https?://#', '', rtrim( $site_url, '/' ) );
-            ?>
+                ?>
                 <a href="<?php echo esc_url( $site_url ); ?>" class="dt-site-card">
                     <div class="dt-site-logo-container">
                         <img src="<?php echo esc_url( $logo_url ); ?>" alt="" class="dt-site-logo" />
