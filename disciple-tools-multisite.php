@@ -220,6 +220,9 @@ class DT_Multisite {
 register_activation_hook( __FILE__, [ 'DT_Multisite', 'activation' ] );
 register_deactivation_hook( __FILE__, [ 'DT_Multisite', 'deactivation' ] );
 
+// Loaded on every request — not gated on is_network_admin().
+require_once __DIR__ . '/includes/login-site-redirect.php';
+
 /**
  * Make the update checker available on multisites when the default theme is not Disciple.Tools
  */
