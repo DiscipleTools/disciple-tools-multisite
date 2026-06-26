@@ -369,12 +369,12 @@ class DT_Multisite_Tab_AI
                     $network_module_states = get_site_option( 'DT_AI_network_modules', [] );
 
                     foreach ( $modules as $module ) {
-                    if ( isset( $module['visible'] ) && $module['visible'] ) {
-                        // Check network state, default to the module's default enabled state if not set
-                        $network_enabled = isset( $network_module_states[ $module['id'] ] )
+                        if ( isset( $module['visible'] ) && $module['visible'] ) {
+                            // Check network state, default to the module's default enabled state if not set
+                            $network_enabled = isset( $network_module_states[ $module['id'] ] )
                             ? $network_module_states[ $module['id'] ]
                             : ( isset( $module['enabled'] ) ? $module['enabled'] : 0 );
-                        ?>
+                            ?>
                         <tr>
                             <td>
                                 <?php echo esc_attr( $module['name'] ) ?>
@@ -385,9 +385,9 @@ class DT_Multisite_Tab_AI
                                 <input type="checkbox" name="<?php echo esc_attr( $module['id'] ) ?>" <?php echo ( $network_enabled ? 'checked' : '' ) ?>>
                             </td>
                         </tr>
-                        <?php
+                            <?php
+                        }
                     }
-                }
                 } // End else (AI plugin available check)
                 ?>
                 <tr>
