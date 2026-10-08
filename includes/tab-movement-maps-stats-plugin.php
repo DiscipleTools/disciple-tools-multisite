@@ -209,7 +209,5 @@ class DT_Movement_Maps_Tab_Network_Dashboard
             }
         }
         return $active_sites;
-
     }
-
 } // end DT_Multisite_Tab_Network_Dashboard class

@@ -204,5 +204,4 @@ class DT_Multisite_Tab_Google_Keys
         <!-- End Box -->
         <?php
     }
-
 }

@@ -701,5 +701,4 @@ class DT_Multisite_Tab_Import_Subsite {
 
         <?php endif;
     }
-
 }
