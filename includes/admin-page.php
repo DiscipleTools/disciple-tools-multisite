@@ -92,6 +92,9 @@ function dt_multisite_network_admin_content(){
             <a href="<?php echo esc_attr( $link ) . 'storage' ?>" class="nav-tab <?php echo ( $tab == 'storage' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
                 <?php echo esc_attr( 'Storage' ) ?>
             </a>
+            <a href="<?php echo esc_attr( $link ) . 'user_permissions' ?>" class="nav-tab <?php echo ( $tab == 'user_permissions' ) ? esc_attr( 'nav-tab-active' ) : ''; ?>">
+                <?php echo esc_attr( 'User Permissions' ) ?>
+            </a>
         </h2>
 
         <?php
@@ -138,6 +141,10 @@ function dt_multisite_network_admin_content(){
                 break;
             case 'storage':
                 $object = new DT_Multisite_Tab_Storage();
+                $object->content();
+                break;
+            case 'user_permissions':
+                $object = new DT_Multisite_Tab_User_Permissions();
                 $object->content();
                 break;
 
