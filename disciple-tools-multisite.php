@@ -243,6 +243,11 @@ add_action( 'plugins_loaded', function (){
                     $theme->get_stylesheet_directory(),
                     basename( $theme->get_stylesheet_directory() )
                 );
+                // Runs these update checks in the background instead of on network admin page loads.
+                $update_checks_file = $theme->get_stylesheet_directory() . '/dt-core/admin/update-checks.php';
+                if ( !class_exists( 'Disciple_Tools_Update_Checks' ) && file_exists( $update_checks_file ) ){
+                    require_once( $update_checks_file );
+                }
             }
         }
         if ( !function_exists( 'get_plugins' ) ) {
