@@ -230,8 +230,8 @@ require( 'includes/admin/plugin-update-checker/plugin-update-checker.php' );
 
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 add_action( 'plugins_loaded', function (){
-    $is_updating_plugin = isset( $_POST['action'] ) && $_POST['action'] === 'update-plugin'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-    $is_updating_theme = isset( $_POST['action'] ) && $_POST['action'] === 'update-theme'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+    $is_updating_plugin = isset( $_POST['action'] ) && $_POST['action'] === 'update-plugin' && current_user_can( 'update_plugins' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+    $is_updating_theme = isset( $_POST['action'] ) && $_POST['action'] === 'update-theme' && current_user_can( 'update_themes' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
     $disable = isset( $_POST['wppusher'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
     if ( !$disable && is_multisite() && ( is_network_admin() || wp_doing_cron() || $is_updating_plugin || $is_updating_theme ) && is_main_site() ){
         // find the Disciple.Tools theme and load the plugin update checker.
