@@ -82,7 +82,10 @@ class DT_Movement_Maps_Tab_Network_Dashboard
                 $site_id = sanitize_key( wp_unslash( $_POST['enable-all'] ) );
 
                 $data_table = sanitize_text_field( wp_unslash( $_POST['db_table'] ) );
-                if ( $data_table ) {
+                $allowed_tables = array_map( function ( $dashboard_site ) use ( $wpdb ) {
+                    return $wpdb->base_prefix . $dashboard_site->blog_id . '_dt_movement_log';
+                }, $active_dashboard_sites );
+                if ( in_array( $data_table, $allowed_tables, true ) ) {
                     $enabled_sites[$site_id] = [
                         'enabled' => true,
                         'table' => $data_table
