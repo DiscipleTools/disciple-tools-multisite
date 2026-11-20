@@ -195,7 +195,13 @@ class DT_Multisite_Login_Site_Redirect {
      * @return array
      */
     public function allow_subsite_redirect_hosts( $allowed_hosts ) {
-        foreach ( get_sites() as $site ) {
+        $sites = get_sites( [
+            'number'   => 0,
+            'archived' => 0,
+            'deleted'  => 0,
+            'spam'     => 0,
+        ] );
+        foreach ( $sites as $site ) {
             $allowed_hosts[] = $site->domain;
         }
         return array_unique( $allowed_hosts );
