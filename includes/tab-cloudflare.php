@@ -45,7 +45,10 @@ class DT_Multisite_Tab_Cloudflare
             && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['cloudflare_nonce'] ) ), 'cloudflare' ) ) {
 
             update_site_option( 'dt_cloudflare_site_key', sanitize_text_field( wp_unslash( $_POST['dt_cloudflare_site_key'] ?? '' ) ) );
-            update_site_option( 'dt_cloudflare_secret_key', sanitize_text_field( wp_unslash( $_POST['dt_cloudflare_secret_key'] ?? '' ) ) );
+            $secret_key = sanitize_text_field( wp_unslash( $_POST['dt_cloudflare_secret_key'] ?? '' ) );
+            if ( $secret_key !== '********' ) {
+                update_site_option( 'dt_cloudflare_secret_key', $secret_key );
+            }
         }
     }
 
@@ -78,7 +81,7 @@ class DT_Multisite_Tab_Cloudflare
                         Cloudflare Turnstile Secret Key
                     </td>
                     <td>
-                        <input type="password" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_cloudflare_secret_key ) ?>" name="dt_cloudflare_secret_key" placeholder="add secret key" />
+                        <input type="password" class="regular-text" style="width:100%;" value="<?php echo esc_attr( !empty( $network_cloudflare_secret_key ) ? '********' : '' ) ?>" name="dt_cloudflare_secret_key" placeholder="add secret key" autocomplete="new-password" />
                     </td>
                 </tr>
                 <tr>

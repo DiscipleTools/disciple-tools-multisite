@@ -60,7 +60,7 @@ class DT_Multisite_Tab_Storage
 
             $details = [
                 'access_key' => $post['connection_type_s3_access_key'] ?? '',
-                'secret_access_key' => $post['connection_type_s3_secret_access_key'] == '********' ? '' : $post['connection_type_s3_secret_access_key'],
+                'secret_access_key' => ( $post['connection_type_s3_secret_access_key'] ?? '' ) === '********' ? ( $existing['secret_access_key'] ?? '' ) : ( $post['connection_type_s3_secret_access_key'] ?? '' ),
                 'region' => $post['connection_type_s3_region'] ?? '',
                 'endpoint' => $post['connection_type_s3_endpoint'] ?? '',
                 'bucket' => $post['connection_type_s3_bucket'] ?? '',
@@ -166,7 +166,7 @@ class DT_Multisite_Tab_Storage
                     <tr>
                         <td style="vertical-align: middle;">Secret Access Key</td>
                         <td>
-                            <input style="min-width: 100%;" type="password" id="connection_type_s3_secret_access_key" name="connection_type_s3_secret_access_key" value="<?php echo esc_attr( $dt_storage_connection['secret_access_key'] ?? '' ); ?>"/>
+                            <input style="min-width: 100%;" type="password" id="connection_type_s3_secret_access_key" name="connection_type_s3_secret_access_key" value="<?php echo esc_attr( !empty( $dt_storage_connection['secret_access_key'] ) ? '********' : '' ); ?>" autocomplete="new-password"/>
                         </td>
                     </tr>
                     <tr>

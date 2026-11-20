@@ -71,7 +71,8 @@ class DT_Multisite_Tab_AI
             $updated_settings['llm_provider'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_providers'] ?? '' ) );
             $updated_settings['llm_provider_chat_path'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_provider_chat_paths'] ?? '' ) );
             $updated_settings['llm_endpoint'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_endpoint'] ?? '' ) );
-            $updated_settings['llm_api_key'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_api_key'] ?? '' ) );
+            $llm_api_key = sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_api_key'] ?? '' ) );
+            $updated_settings['llm_api_key'] = $llm_api_key === '********' ? ( $current_settings['llm_api_key'] ?? '' ) : $llm_api_key;
             $updated_settings['llm_model'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_llm_model'] ?? '' ) );
 
             update_site_option( 'DT_AI_connection_settings', $updated_settings );
@@ -89,7 +90,8 @@ class DT_Multisite_Tab_AI
             $updated_settings['transcript_llm_provider'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_providers'] ?? '' ) );
             $updated_settings['transcript_llm_provider_transcript_path'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_provider_transcript_paths'] ?? '' ) );
             $updated_settings['transcript_llm_endpoint'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_endpoint'] ?? '' ) );
-            $updated_settings['transcript_llm_api_key'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_api_key'] ?? '' ) );
+            $transcript_llm_api_key = sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_api_key'] ?? '' ) );
+            $updated_settings['transcript_llm_api_key'] = $transcript_llm_api_key === '********' ? ( $current_settings['transcript_llm_api_key'] ?? '' ) : $transcript_llm_api_key;
             $updated_settings['transcript_llm_model'] = sanitize_text_field( wp_unslash( $_POST['dt_ai_transcript_llm_model'] ?? '' ) );
 
             update_site_option( 'DT_AI_connection_settings', $updated_settings );
@@ -229,7 +231,7 @@ class DT_Multisite_Tab_AI
                             API Key
                         </td>
                         <td>
-                            <input type="password" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_settings['llm_api_key'] ) ?>" name="dt_ai_llm_api_key" placeholder="Add Chat LLM API Key" />
+                            <input type="password" class="regular-text" style="width:100%;" value="<?php echo esc_attr( !empty( $network_settings['llm_api_key'] ) ? '********' : '' ) ?>" name="dt_ai_llm_api_key" placeholder="Add Chat LLM API Key" autocomplete="new-password" />
                         </td>
                     </tr>
                     <tr>
@@ -315,7 +317,7 @@ class DT_Multisite_Tab_AI
                         API Key
                     </td>
                     <td>
-                        <input type="password" class="regular-text" style="width:100%;" value="<?php echo esc_attr( $network_settings['transcript_llm_api_key'] ) ?>" name="dt_ai_transcript_llm_api_key" placeholder="Add Transcript LLM API Key" />
+                        <input type="password" class="regular-text" style="width:100%;" value="<?php echo esc_attr( !empty( $network_settings['transcript_llm_api_key'] ) ? '********' : '' ) ?>" name="dt_ai_transcript_llm_api_key" placeholder="Add Transcript LLM API Key" autocomplete="new-password" />
                     </td>
                 </tr>
                 <tr>
