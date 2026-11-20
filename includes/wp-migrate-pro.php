@@ -14,7 +14,7 @@ add_filter('wpmdb_get_alter_queries', function ( $queries, $state_data ){
         return $queries;
     }
 
-    $blog_id = isset( $state_data['mst_destination_subsite'] ) ? $state_data['mst_destination_subsite'] : $this->selected_subsite( $state_data );
+    $blog_id = isset( $state_data['mst_destination_subsite'] ) ? (int) $state_data['mst_destination_subsite'] : 0;
 
     if ( 1 > $blog_id ){
         return $queries;
