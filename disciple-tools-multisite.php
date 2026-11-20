@@ -79,6 +79,7 @@ function dt_multisite() {
 }
 add_action( 'init', 'dt_multisite' );
 require_once( 'includes/wp-migrate-pro.php' );
+require_once( 'includes/hook-functions.php' );
 
 class DT_Multisite {
 
@@ -118,7 +119,6 @@ class DT_Multisite {
             // adds links to the plugin description area in the plugin admin list.
             add_filter( 'plugin_row_meta', [ $this, 'plugin_description_links' ], 10, 4 );
         }
-        require_once( 'includes/hook-functions.php' );
     }
 
     /**

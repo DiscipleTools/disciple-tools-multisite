@@ -11,10 +11,10 @@ add_action( 'wp_delete_site', function( $old_site ) {
      */
     global $wpdb;
     $table_list = $wpdb->get_col( $wpdb->prepare( '
-        SELECT table_name as table_name FROM information_schema.TABLES WHERE table_name LIKE %s;
+        SELECT table_name as table_name FROM information_schema.TABLES WHERE table_schema = DATABASE() AND table_name LIKE %s;
         ', $wpdb->esc_like( "{$wpdb->base_prefix}{$old_site->id}_" ) . '%' ) );
 
     foreach ( $table_list as $tb ) {
-        $wpdb->query( "DROP TABLE IF EXISTS {$tb}" ); // phpcs:ignore
+        $wpdb->query( 'DROP TABLE IF EXISTS `' . str_replace( '`', '``', $tb ) . '`' ); // phpcs:ignore
     }
 }, 10, 1 );
