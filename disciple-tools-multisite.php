@@ -261,7 +261,7 @@ add_action( 'plugins_loaded', function (){
             if ( file_exists( $plugin_path . '/version-control.json' ) && isset( $plugin['PluginURI'] ) && !empty( $plugin['PluginURI'] ) ){
                 $hosted_json = str_replace( 'github.com', 'raw.githubusercontent.com', $plugin['PluginURI'] ) . '/master/version-control.json';
                 //don't keep retrying failed updates
-                if ( isset( $dont_update[$hosted_json] ) && $dont_update[$hosted_json] > time() - DAY_IN_SECONDS * 30 ){
+                if ( isset( $dont_update[$hosted_json] ) && $dont_update[$hosted_json] > time() - DAY_IN_SECONDS * 7 ){
                     continue;
                 }
                 //don't set if already being set by a plugin
